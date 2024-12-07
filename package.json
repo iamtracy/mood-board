@@ -6,7 +6,8 @@
     "nx": "npx nx",
     "dev": "npx nx run-many --target=serve",
     "build": "nx run-many --target=build",
-    "test:unit:ci": "nx run-many --target=test --coverage"
+    "test:unit:ci": "nx run-many --target=test --coverage --ci",
+    "test:unit": "nx affected:test --all --parallel --watch"
   },
   "private": true,
   "dependencies": {

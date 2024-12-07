@@ -22,6 +22,10 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit:ci
 
+      - name: List coverage files
+        run: |
+          ls -R ./coverage
+
       - name: Upload coverage to Codecov
         if: success()
         uses: codecov/codecov-action@v3

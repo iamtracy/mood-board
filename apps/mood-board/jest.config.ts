@@ -8,4 +8,4 @@ export default {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageReporters: ["lcov", "text-summary"],
   coverageDirectory: '../../coverage/apps/mood-board',
-};
+}
