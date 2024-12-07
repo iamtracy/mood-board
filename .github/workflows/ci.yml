@@ -28,4 +28,4 @@ jobs:
         run: |
           npm install
           npm run cdk bootstrap aws://${{ secrets.AWS_ACCOUNT_ID }}/us-east-1
-          npm run cdk deploy --require-approval never
+          npm run deploy:ci
