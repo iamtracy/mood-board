@@ -38,7 +38,7 @@ export class IacStack extends cdk.Stack {
         image: ecs.ContainerImage.fromAsset(
           path.join(__dirname, '../../'),
         ),
-        containerPort: +(process.env.API_PORT ?? 3000),
+        containerPort: +(process.env.PORT!),
         containerName: 'mood-board-container'
       },
     })

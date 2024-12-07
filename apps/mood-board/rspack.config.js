@@ -1,12 +1,12 @@
 const { composePlugins, withNx, withWeb } = require('@nx/rspack')
 
-const { API_BASE_URL, API_PORT, PROTOCOL } = process.env
+const { BASE_URL, PORT } = process.env
 
-if (!API_BASE_URL || !API_PORT || !PROTOCOL) {
-  throw new Error('API_BASE_URL, API_PORT, and PROTOCOL must be defined in the environment');
+if (!BASE_URL || !PORT) {
+  throw new Error('BASE_URL, and PORT must be defined in the environment');
 }
 
-const apiUrl = `${PROTOCOL}://${API_BASE_URL}:${API_PORT}`
+const apiUrl = `http://${BASE_URL}:${PORT}`
 
 module.exports = composePlugins(withNx(), withWeb(), (config) => {
   return {

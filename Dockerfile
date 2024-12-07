@@ -1,17 +1,17 @@
-FROM --platform=linux/amd64 node:22-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install -g nx
-RUN npm install
+RUN npm install -g nx && \
+    npm install
 
 COPY . .
 
 RUN npm run build
 
-FROM --platform=linux/amd64 node:22-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -20,6 +20,9 @@ COPY --from=build /app/node_modules ./node_modules
 
 ENV NODE_ENV=production
 
-EXPOSE 3000
+ARG PORT=3000
+ENV PORT=${PORT}
+
+EXPOSE ${PORT}
 
 CMD ["node", "dist/api/main"]
