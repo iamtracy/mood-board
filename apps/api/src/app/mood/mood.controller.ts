@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { MoodService } from './mood.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MoodEntity } from './mood.entity';
@@ -18,6 +18,28 @@ export class MoodController {
     })
     async findAll(): Promise<MoodEntity[]> {
         const data = await this.moodService.findAll()
+        return data
+    }
+
+    @Get(':id')
+    @ApiResponse({
+        status: 200,
+        description: 'Get a mood',
+        type: MoodEntity,
+    })
+    async findOne(id: number): Promise<MoodEntity> {
+        const data = await this.moodService.findOne(id)
+        return data
+    }
+
+    @Post()
+    @ApiResponse({
+        status: 201,
+        description: 'Create a mood',
+        type: MoodEntity,
+    })
+    async create(@Body() body: Partial<MoodEntity>): Promise<MoodEntity> {
+        const data = await this.moodService.create(body)
         return data
     }
 }
