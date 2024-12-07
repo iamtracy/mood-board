@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from './api'
 
 const fetchData = async () => {
-  const response = await api.get('')
+  const response = await api.get('mood')
   return response.data 
 }
 

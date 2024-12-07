@@ -6,6 +6,7 @@
 : "${POSTGRES_PASSWORD:=postgres}"  # Default password for PostgreSQL
 : "${DB_HOST:=localhost}"  # Host for PostgreSQL
 : "${DATABASE_PORT:=5432}"  # Port for PostgreSQL
+: "${POSTGRES_DB:=mood-board}"  # Default database name for PostgreSQL
 
 # Load environment variables from .env file if it exists
 if [ -f .env ]; then
@@ -26,6 +27,7 @@ start_postgres() {
   docker run --name $CONTAINER_NAME \
     -e POSTGRES_USER=$POSTGRES_USER \
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+    -e POSTGRES_DB=$POSTGRES_DB \
     -d -p $DATABASE_PORT:$DATABASE_PORT \
     postgres:latest
 

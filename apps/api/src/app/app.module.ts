@@ -1,19 +1,21 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { join } from 'path'
 
-const isProduction = process.env.NODE_ENV === 'production'
+import { MoodModule } from './mood/mood.module'
 
 const {
   DB_HOST,
   DB_PORT,
+  NODE_ENV,
   POSTGRES_USERNAME,
   POSTGRES_PASSWORD,
+  POSTGRES_DB,
 } = process.env
+
+const isProduction = NODE_ENV === 'production'
 
 @Module({
   imports: [
@@ -29,15 +31,16 @@ const {
         []
     ),
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      database: POSTGRES_DB,
       host: DB_HOST,
-      port: +DB_PORT,
-      username: POSTGRES_USERNAME,
       password: POSTGRES_PASSWORD,
+      port: +DB_PORT,
       synchronize: !isProduction,
+      type: 'postgres',
+      username: POSTGRES_USERNAME,
+      autoLoadEntities: true,
     }),
+    MoodModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
