@@ -22,16 +22,6 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit:ci
 
-      - name: List coverage files
-        run: |
-          ls -R ./coverage
-
-      - name: Upload coverage to Codecov
-        if: success()
-        uses: codecov/codecov-action@v3
-        with:
-          files: $(find ./coverage -name 'lcov-report*' -type f)
-
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
