@@ -30,6 +30,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy Infrastructure with CDK
+        if: github.ref == 'refs/heads/main'
         working-directory: ./iac
         run: |
           npm install
