@@ -3,7 +3,7 @@ name: Build and Deploy IaC with Docker
 on:
   push:
     branches:
-      - main
+      - unit-testing
   pull_request:
     branches:
       - main
@@ -15,6 +15,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Run unit tests
+        run: npm run test:unit:ci
+
+      - name: Upload coverage to Codecov
+        if: success()
+        uses: codecov/codecov-action@v3
+        with:
+          files: $(find ./coverage -name 'lcov-report*' -type f)
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
