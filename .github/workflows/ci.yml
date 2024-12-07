@@ -23,6 +23,7 @@ jobs:
         run: npm run test:unit:ci
 
       - name: Set up AWS CLI
+        if: github.ref == 'refs/heads/main'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
