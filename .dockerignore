@@ -1,0 +1,5 @@
+**/node_modules
+iac/cdk.out
+dist
+.vscode
+.github

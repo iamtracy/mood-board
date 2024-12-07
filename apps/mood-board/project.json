@@ -1,0 +1,56 @@
+{
+  "name": "mood-board",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/mood-board/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/rspack:rspack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "web",
+        "outputPath": "dist/apps/mood-board",
+        "index": "apps/mood-board/src/index.html",
+        "main": "apps/mood-board/src/main.tsx",
+        "tsConfig": "apps/mood-board/tsconfig.app.json",
+        "rspackConfig": "apps/mood-board/rspack.config.js",
+        "assets": [
+          "apps/mood-board/src/favicon.ico",
+          "apps/mood-board/src/assets"
+        ]
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production",
+          "optimization": true,
+          "sourceMap": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/rspack:dev-server",
+      "options": {
+        "buildTarget": "mood-board:build:development"
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "buildTarget": "mood-board:build:production"
+        }
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "mood-board:build",
+        "spa": true
+      }
+    }
+  }
+}
