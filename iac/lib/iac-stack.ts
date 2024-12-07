@@ -52,7 +52,7 @@ export class IacStack extends cdk.Stack {
       publicLoadBalancer: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
-        containerPort: +(process.env.PORT ?? 3000),
+        containerPort: +(process.env.PORT!),
         containerName: 'mood-board-container',
       },
     })
