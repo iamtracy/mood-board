@@ -4,14 +4,10 @@ import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
-const rootPath = join(__dirname, '..', 'mood-board')
-
-console.log(rootPath)
-
 @Module({
   imports: [  
     ServeStaticModule.forRoot({
-      rootPath,
+      rootPath: join(__dirname, '..', 'mood-board'),
       exclude: ['/api/(.*)'],
     }),
   ],
