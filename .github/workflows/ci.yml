@@ -3,7 +3,7 @@ name: Build and Deploy IaC with Docker
 on:
   push:
     branches:
-      - main
+      - unit-testing
   pull_request:
     branches:
       - main
@@ -21,6 +21,9 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:unit:ci
+
+      - name: Run unit tests
+        run: npm run lint
 
       - name: Set up AWS CLI
         if: github.ref == 'refs/heads/main'
