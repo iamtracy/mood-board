@@ -26,5 +26,6 @@ jobs:
       - name: Deploy Infrastructure with CDK
         working-directory: ./iac
         run: |
+          npm install
           npm run cdk bootstrap aws://$AWS_ACCOUNT_ID/us-east-1
           npm run cdk deploy --require-approval never
