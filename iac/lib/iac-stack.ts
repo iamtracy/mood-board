@@ -31,8 +31,14 @@ export class IacStack extends cdk.Stack {
       vpc,
     })
 
-    const dbPassword = new secretsmanager.Secret(this, 'DBPassword', {
-      secretName: 'mood-board-db-password',
+    const dbPassword = new secretsmanager.Secret(this, 'MoodBoardDbPassword', {
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ username: 'postgres' }),
+        excludePunctuation: true,
+        includeSpace: false,
+        generateStringKey: 'password',
+        passwordLength: 30,
+      },
     })
 
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
@@ -67,7 +73,7 @@ export class IacStack extends cdk.Stack {
           DB_PORT: '5432',
           POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'mood-board',
-          POSTGRES_PASSWORD: 'postgres',
+          POSTGRES_PASSWORD: dbPassword.secretValue.toString(),
           NODE_ENV: 'production'
         },
       },
