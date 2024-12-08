@@ -95,6 +95,10 @@ export class IacStack extends cdk.Stack {
       desiredCount: 1,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
+      healthCheck: {
+        command: ['CMD-SHELL', 'curl -f http://localhost:3000/api/health || exit 1'],
+        retries: 5,
+      },
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         containerPort: 3000,

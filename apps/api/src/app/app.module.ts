@@ -8,6 +8,7 @@ import { join } from 'path'
 import { AppConfig, DatabaseConfig } from '../config'
 import { MoodModule } from './mood/mood.module'
 import { MoodEntity } from './mood/mood.entity'
+import { HealthModule } from './health/health.module'
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { MoodEntity } from './mood/mood.entity'
       inject: [ConfigService],
     }),
     MoodModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
