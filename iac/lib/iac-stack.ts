@@ -76,14 +76,17 @@ export class IacStack extends cdk.Stack {
           DB_PORT: '5432',
           POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'moodboard',
-          POSTGRES_PASSWORD: dbPassword.secretValue.unsafeUnwrap(),
           NODE_ENV: 'production'
+        },
+        secrets: {
+          POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
       },
     })
   }
 }
 
+// {"password":"mxsAnqqk3xCKNrjUO8iB34uJS97hKi","dbname":"moodboard","engine":"postgres","port":5432,"dbInstanceIdentifier":"iacstack-moodboardrdse3aca0a8-iyt26erpfdlu","host":"iacstack-moodboardrdse3aca0a8-iyt26erpfdlu.cxsyseic4qgv.us-east-1.rds.amazonaws.com","username":"postgres"}
 // TODO: Add the following code to the IacStack class once you have the domain set up
 // import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 // import * as route53 from 'aws-cdk-lib/aws-route53'
