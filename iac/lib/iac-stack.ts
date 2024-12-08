@@ -84,6 +84,7 @@ export class IacStack extends cdk.Stack {
   }
 }
 
+// TODO: Add the following code to the IacStack class once you have the domain set up
 // import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 // import * as route53 from 'aws-cdk-lib/aws-route53'
 // import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
