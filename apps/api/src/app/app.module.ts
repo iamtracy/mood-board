@@ -7,6 +7,7 @@ import { join } from 'path'
 
 import { AppConfig, DatabaseConfig } from '../config'
 import { MoodModule } from './mood/mood.module'
+import { MoodEntity } from './mood/mood.entity'
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { MoodModule } from './mood/mood.module'
         username: configService.get('POSTGRES_USERNAME'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [__dirname + './**/*.entity.{js,ts}'],
+        entities: [MoodEntity],
         synchronize: configService.get('NODE_ENV') === 'development',
         extra: {
           ssl: configService.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : null,

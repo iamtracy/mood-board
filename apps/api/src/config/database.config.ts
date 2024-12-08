@@ -1,10 +1,11 @@
 import { ConfigService, registerAs } from '@nestjs/config'
+import { MoodEntity } from '../app/mood/mood.entity'
 
 const configService = new ConfigService()
 
 export default registerAs('database', () => ({
     type: 'postgres',
-    entities: [`${__dirname}/../**/*.entity.{js,ts}`],
+    entities: [MoodEntity],
     logging:  configService.get('NODE_ENV') === 'development',
     migrations: [`${__dirname}/../../../db/migrations/*.ts`],
     migrationsTableName: 'migrations',
@@ -14,4 +15,7 @@ export default registerAs('database', () => ({
     password: configService.get('POSTGRES_PASSWORD'),
     database: configService.get('POSTGRES_DB'),
     synchronize: configService.get('NODE_ENV') === 'development',
+    extra: {
+        ssl: configService.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : null,
+    }
 }))
