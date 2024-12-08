@@ -44,7 +44,8 @@ export class IacStack extends cdk.Stack {
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO
+        ec2.InstanceClass.BURSTABLE3,
+        ec2.InstanceSize.SMALL
       ),
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
