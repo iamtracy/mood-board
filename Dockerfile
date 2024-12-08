@@ -14,6 +14,7 @@ WORKDIR /app
 
 COPY --from=build /app/dist/apps ./dist
 COPY --from=build /app/db ./dist/db
+COPY --from=build /app/tsconfig.migration.json ./dist/db/tsconfig.migration.json
 COPY --from=build /app/node_modules ./node_modules
 
 ENV NODE_ENV=production
@@ -29,4 +30,4 @@ ENV SUBDOMAIN=${SUBDOMAIN}
 
 EXPOSE ${PORT}
 
-CMD npx typeorm migration:run -d dist/db/typeorm.config.ts && node dist/api/main
+CMD npx ts-node -P dist/db/tsconfig.migration.json --require tsconfig-paths/register /app/node_modules/typeorm/cli.js migration:run -d dist/db/typeorm.config.ts &&  node dist/api/main
