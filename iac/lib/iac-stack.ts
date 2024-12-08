@@ -69,11 +69,11 @@ export class IacStack extends cdk.Stack {
       publicLoadBalancer: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
-        containerPort: +(process.env.PORT!),
+        containerPort: 3000,
         containerName: 'mood-board-container',
         environment: {
           DB_HOST: dbInstance.dbInstanceEndpointAddress,
-          DB_PORT: '5432',
+          DB_PORT: dbInstance.dbInstanceEndpointPort,
           POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'moodboard',
           NODE_ENV: 'production'
