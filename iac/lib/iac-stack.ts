@@ -100,8 +100,10 @@ export class IacStack extends cdk.Stack {
         environment: {
           DB_HOST: dbInstance.dbInstanceEndpointAddress,
           DB_PORT: dbInstance.dbInstanceEndpointPort,
-          POSTGRES_USERNAME: secretObject.username,
-          POSTGRES_PASSWORD: secretObject.password, 
+          // @ts-expect-error secretValueString is a string
+          POSTGRES_USERNAME: secretValueString.username,
+          // @ts-expect-error secretValueString is a string
+          POSTGRES_PASSWORD: secretValueString.password, 
           POSTGRES_DB: 'moodboard',
           NODE_ENV: 'production'
         },
