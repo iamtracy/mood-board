@@ -29,7 +29,8 @@ module.exports = [
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     // Override or add rules here
     rules: {
-      "semi": ["error", "never"],
+      'semi': ['error', 'never'],
+      'quotes': ['error', 'single'],
     },
   },
 ];
