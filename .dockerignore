@@ -3,4 +3,3 @@ iac/cdk.out
 dist
 .vscode
 .github
-db/**/*.ts

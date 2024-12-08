@@ -7,7 +7,6 @@
 dist
 tmp
 out-tsc
-db/**/*.js
 
 # dependencies
 node_modules
