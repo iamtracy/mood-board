@@ -16,6 +16,8 @@ export default registerAs('database', () => ({
     database: configService.get('POSTGRES_DB'),
     synchronize: configService.get('NODE_ENV') === 'development',
     extra: {
-        ssl: configService.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : null,
-    }
+        ssl: {
+            rejectUnauthorized: false,
+        },
+    },
 }))
