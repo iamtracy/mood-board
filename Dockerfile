@@ -28,4 +28,4 @@ ENV SUBDOMAIN=${SUBDOMAIN}
 
 EXPOSE ${PORT}
 
-CMD ["node", "dist/api/main"]
+CMD ["sh", "-c", "npm run migration:run && node dist/api/main"]

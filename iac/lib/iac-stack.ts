@@ -68,12 +68,12 @@ export class IacStack extends cdk.Stack {
           POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'mood-board',
           POSTGRES_PASSWORD: dbPassword.secretValue.toString(),
+          NODE_ENV: 'production'
         },
       },
     })
   }
 }
-
 
 // import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 // import * as route53 from 'aws-cdk-lib/aws-route53'

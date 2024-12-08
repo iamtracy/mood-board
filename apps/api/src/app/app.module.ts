@@ -29,7 +29,14 @@ import { AppConfig, DatabaseConfig } from '../config'
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        ...configService.get('database'),
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('POSTGRES_USERNAME'),
+        password: configService.get('POSTGRES_PASSWORD'),
+        database: configService.get('POSTGRES_DB'),
+        entities: [__dirname + './**/*.entity{.ts,.js}'],
+        synchronize: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
