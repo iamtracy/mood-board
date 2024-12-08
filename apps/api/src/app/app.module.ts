@@ -5,22 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { join } from 'path'
 
 import { MoodModule } from './mood/mood.module'
-
-const {
-  DB_HOST,
-  DB_PORT,
-  NODE_ENV,
-  POSTGRES_USERNAME,
-  POSTGRES_PASSWORD,
-  POSTGRES_DB,
-} = process.env
-
-const isProduction = NODE_ENV === 'production'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { AppConfig, DatabaseConfig } from '../config'
 
 @Module({
   imports: [
     ...(
-      isProduction
+      (process.env.NODE_ENV === 'production')
         ? [
             ServeStaticModule.forRoot({
               rootPath: join(__dirname, '..', 'mood-board'),
@@ -30,15 +21,17 @@ const isProduction = NODE_ENV === 'production'
         :
         []
     ),
-    TypeOrmModule.forRoot({
-      database: POSTGRES_DB,
-      host: DB_HOST,
-      password: POSTGRES_PASSWORD,
-      port: +DB_PORT,
-      synchronize: !isProduction,
-      type: 'postgres',
-      username: POSTGRES_USERNAME,
-      autoLoadEntities: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+      load: [AppConfig, DatabaseConfig],
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        ...configService.get('database'),
+      }),
+      inject: [ConfigService],
     }),
     MoodModule
   ],

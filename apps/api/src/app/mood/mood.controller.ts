@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MoodService } from './mood.service';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags,  } from '@nestjs/swagger';
 import { MoodEntity } from './mood.entity';
 
 @ApiTags('mood')
@@ -27,8 +27,8 @@ export class MoodController {
         description: 'Get a mood',
         type: MoodEntity,
     })
-    async findOne(id: number): Promise<MoodEntity> {
-        const data = await this.moodService.findOne(id)
+    async findOne(@Param('id') id: string): Promise<MoodEntity> {
+        const data = await this.moodService.findOne(+id)
         return data
     }
 
