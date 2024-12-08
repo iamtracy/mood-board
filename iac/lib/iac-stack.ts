@@ -27,26 +27,10 @@ export class IacStack extends cdk.Stack {
       ],
     })
 
-    const ecsSecurityGroup = new ec2.SecurityGroup(this, 'EcsSecurityGroup', {
-      vpc,
-      description: 'Allow communication from ECS tasks',
-    })
-
-    const rdsSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
-      vpc,
-      description: 'Allow communication from ECS tasks to PostgreSQL',
-    })
-
-    rdsSecurityGroup.addIngressRule(
-      ecsSecurityGroup,
-      ec2.Port.tcp(5432),
-      'Allow ECS tasks to connect to PostgreSQL'
-    )
-    
     const cluster = new ecs.Cluster(this, 'MoodBoardCluster', {
       vpc,
     })
-
+    
     const dbPassword = new secretsmanager.Secret(this, 'MoodBoardDbPassword', {
       generateSecretString: {
         secretStringTemplate: JSON.stringify({ username: 'postgres' }),
@@ -55,6 +39,11 @@ export class IacStack extends cdk.Stack {
         generateStringKey: 'password',
         passwordLength: 30,
       },
+    })
+
+    const dbSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
+      vpc,
+      description: 'Allow communication from ECS tasks to PostgreSQL',
     })
 
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
@@ -69,7 +58,7 @@ export class IacStack extends cdk.Stack {
       credentials: rds.Credentials.fromSecret(dbPassword),
       databaseName: 'moodboard',
       allocatedStorage: 20,
-      securityGroups: [rdsSecurityGroup],
+      securityGroups: [dbSecurityGroup],
       subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {
         vpc,
         description: 'Subnets for MoodBoard RDS instance',
@@ -84,9 +73,22 @@ export class IacStack extends cdk.Stack {
     console.log('username', secretObject.username)
     console.log('password', secretObject.password)
 
+    const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
+      vpc,
+      allowAllOutbound: true,
+      description: 'Allow communication from ECS tasks',
+    })
+    
+    dbSecurityGroup.addIngressRule(
+      ecsSecurityGroup,
+      ec2.Port.tcp(5432),
+      'Allow ECS tasks to connect to PostgreSQL'
+    )
+    
     new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       cluster,
       cpu: 512,
+      securityGroups: [ecsSecurityGroup],
       desiredCount: 1,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
