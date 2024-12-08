@@ -4,7 +4,7 @@ const configService = new ConfigService()
 
 export default registerAs('database', () => ({
     type: 'postgres',
-    entities: [`${__dirname}/../**/*.entity.ts`],
+    entities: [`${__dirname}/../**/*.entity.{js,ts}`],
     logging:  configService.get('NODE_ENV') === 'development',
     migrations: [`${__dirname}/../../../db/migrations/*.ts`],
     migrationsTableName: 'migrations',

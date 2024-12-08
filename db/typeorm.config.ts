@@ -17,7 +17,7 @@ export default new DataSource({
   username: configService.get('POSTGRES_USERNAME'),
   password: configService.get('POSTGRES_PASSWORD'),
   database: configService.get('POSTGRES_DB'),
-  entities: [path.join(__dirname, '../apps/api/**/*.entity{.ts,.js}')],
+  entities: [path.join(__dirname, '../apps/api/**/*.entity.{ts,js}')],
   synchronize: configService.get('NODE_ENV') === 'development',
   logging: configService.get('NODE_ENV') === 'development',
   migrations: [path.join(__dirname, 'migrations/*{.ts,.js}')],
