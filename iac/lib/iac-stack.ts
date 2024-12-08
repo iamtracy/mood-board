@@ -49,7 +49,7 @@ export class IacStack extends cdk.Stack {
       ),
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
-      databaseName: 'mood-board',
+      databaseName: 'moodboard',
       allocatedStorage: 20,
       securityGroups: [new ec2.SecurityGroup(this, 'RdsSecurityGroup', { vpc })],
       subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {

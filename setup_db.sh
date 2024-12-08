@@ -6,7 +6,7 @@
 : "${POSTGRES_PASSWORD:=postgres}"  # Default password for PostgreSQL
 : "${DB_HOST:=localhost}"  # Host for PostgreSQL
 : "${DATABASE_PORT:=5432}"  # Port for PostgreSQL
-: "${POSTGRES_DB:=mood-board}"  # Default database name for PostgreSQL
+: "${POSTGRES_DB:=moodboard}"  # Default database name for PostgreSQL
 
 # Load environment variables from .env file if it exists
 if [ -f .env ]; then
