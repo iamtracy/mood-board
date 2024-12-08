@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:22 AS build
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ RUN npm install -g nx && npm install
 COPY . .
 RUN npm run build
 
-FROM node:22-alpine
+FROM node:22
 
 WORKDIR /app
 
