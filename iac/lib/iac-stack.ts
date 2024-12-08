@@ -5,6 +5,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs'
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
+import * as iam from 'aws-cdk-lib/aws-iam'
 
 import * as path from 'path'
 
@@ -60,6 +61,24 @@ export class IacStack extends cdk.Stack {
       }),
       publiclyAccessible: false,
     })
+
+    const ecsTaskRole = new iam.Role(this, 'EcsTaskRole', {
+      assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerServiceFullAccess')
+      ]
+    })
+
+    const secretsManagerPolicy = new iam.Policy(this, 'SecretsManagerPolicy', {
+      statements: [
+        new iam.PolicyStatement({
+          actions: ['secretsmanager:GetSecretValue'],
+          resources: [dbPassword.secretArn],
+        }),
+      ],
+    })
+    ecsTaskRole.attachInlinePolicy(secretsManagerPolicy)
     
     new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       cluster,
@@ -82,11 +101,13 @@ export class IacStack extends cdk.Stack {
           POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
       },
+      taskDefinition: new ecs.FargateTaskDefinition(this, 'MoodBoardTaskDefinition', {
+        taskRole: ecsTaskRole,
+      }),
     })
   }
 }
 
-// {"password":"mxsAnqqk3xCKNrjUO8iB34uJS97hKi","dbname":"moodboard","engine":"postgres","port":5432,"dbInstanceIdentifier":"iacstack-moodboardrdse3aca0a8-iyt26erpfdlu","host":"iacstack-moodboardrdse3aca0a8-iyt26erpfdlu.cxsyseic4qgv.us-east-1.rds.amazonaws.com","username":"postgres"}
 // TODO: Add the following code to the IacStack class once you have the domain set up
 // import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 // import * as route53 from 'aws-cdk-lib/aws-route53'
