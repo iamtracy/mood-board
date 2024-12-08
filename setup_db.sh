@@ -29,7 +29,7 @@ start_postgres() {
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
     -e POSTGRES_DB=$POSTGRES_DB \
     -d -p $DATABASE_PORT:$DATABASE_PORT \
-    postgres:latest
+    postgres:17.2
 
   echo "PostgreSQL is now running on $DB_HOST:$DATABASE_PORT with user $POSTGRES_USER"
 }

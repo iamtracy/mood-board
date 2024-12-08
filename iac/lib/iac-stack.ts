@@ -42,7 +42,9 @@ export class IacStack extends cdk.Stack {
     })
 
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
-      engine: rds.DatabaseInstanceEngine.POSTGRES,
+      engine: rds.DatabaseInstanceEngine.postgres({
+        version: rds.PostgresEngineVersion.VER_17_2,
+      }),
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.BURSTABLE3,
         ec2.InstanceSize.SMALL

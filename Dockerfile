@@ -13,6 +13,7 @@ FROM node:22-alpine
 WORKDIR /app
 
 COPY --from=build /app/dist/apps ./dist
+COPY --from=build /app/db ./dist/db
 COPY --from=build /app/node_modules ./node_modules
 
 ENV NODE_ENV=production
@@ -28,4 +29,4 @@ ENV SUBDOMAIN=${SUBDOMAIN}
 
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "npm run migration:run && node dist/api/main"]
+CMD npx typeorm migration:run -d dist/db/typeorm.config.ts && node dist/api/main
