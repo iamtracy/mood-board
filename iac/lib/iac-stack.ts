@@ -63,11 +63,11 @@ export class IacStack extends cdk.Stack {
         containerPort: +(process.env.PORT!),
         containerName: 'mood-board-container',
         environment: {
-          DATABASE_HOST: dbInstance.dbInstanceEndpointAddress,
-          DATABASE_PORT: '5432',
-          DATABASE_USER: 'postgres',
-          DATABASE_NAME: 'mood-board',
-          DATABASE_PASSWORD: dbPassword.secretValue.toString(),
+          DB_HOST: dbInstance.dbInstanceEndpointAddress,
+          DB_PORT: '5432',
+          POSTGRES_USERNAME: 'postgres',
+          POSTGRES_DB: 'mood-board',
+          POSTGRES_PASSWORD: dbPassword.secretValue.toString(),
         },
       },
     })
