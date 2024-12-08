@@ -66,14 +66,7 @@ export class IacStack extends cdk.Stack {
       publiclyAccessible: false,
     })
 
-    const secretValueString = dbPassword.secretValue.unsafeUnwrap()
-
-    console.log('secretObject', secretValueString)
-    // @ts-expect-error secretValueString is a string
-    console.log('username', secretValueString.username)
-    // @ts-expect-error secretValueString is a string
-    console.log('password', secretValueString.password)
-
+  
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
       vpc,
       allowAllOutbound: true,
@@ -100,16 +93,13 @@ export class IacStack extends cdk.Stack {
         environment: {
           DB_HOST: dbInstance.dbInstanceEndpointAddress,
           DB_PORT: dbInstance.dbInstanceEndpointPort,
-          // @ts-expect-error secretValueString is a string
-          POSTGRES_USERNAME: secretValueString.username,
-          // @ts-expect-error secretValueString is a string
-          POSTGRES_PASSWORD: secretValueString.password, 
+          POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'moodboard',
           NODE_ENV: 'production'
         },
-        // secrets: {
-        //   POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
-        // },
+        secrets: {
+          POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
+        },
       },
     })
   }
