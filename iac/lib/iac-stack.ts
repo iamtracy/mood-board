@@ -67,7 +67,7 @@ export class IacStack extends cdk.Stack {
           DB_PORT: '5432',
           POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'mood-board',
-          POSTGRES_PASSWORD: dbPassword.secretValue.toString(),
+          POSTGRES_PASSWORD: dbPassword.secretValue.unsafeUnwrap(),
           NODE_ENV: 'production'
         },
       },
