@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the environment variables (replace these with actual values or export from your secrets management service)
-DB_HOST=${DB_HOST:-'postgres-db'}           # Default to 'localhost' if not set
+DB_HOST=${DB_HOST:-'docker.for.mac.host.internal'}           # Default to 'localhost' if not set
 DB_PORT=${DB_PORT:-'5432'}                # Default to '5432' if not set
 POSTGRES_USERNAME=${POSTGRES_USERNAME:-'postgres'} # Default to 'postgres' if not set
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-'postgres'} # Default to 'your-password' if not set

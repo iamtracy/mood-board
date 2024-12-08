@@ -20,6 +20,6 @@ export default new DataSource({
   entities: [path.join(__dirname, '../apps/api/**/*.entity.{ts,js}')],
   synchronize: configService.get('NODE_ENV') === 'development',
   logging: configService.get('NODE_ENV') === 'development',
-  migrations: [path.join(__dirname, 'migrations/*{.ts,.js}')],
+  migrations: [path.join(__dirname, '**/migrations/*{.ts,.js}')],
   migrationsTableName: 'migrations',
 })
