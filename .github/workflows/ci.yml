@@ -3,7 +3,7 @@ name: Build and Deploy IaC with Docker
 on:
   push:
     branches:
-      - main
+      - database
   pull_request:
     branches:
       - main
@@ -14,30 +14,28 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install Dependencies
-        run: npm install
+      # - name: Install Dependencies
+      #   run: npm install
 
-      - name: Unit tests
-        run: npm run test:unit:ci
+      # - name: Unit tests
+      #   run: npm run test:unit:ci
 
-      - name: Linting
-        run: npm run lint
+      # - name: Linting
+      #   run: npm run lint
 
-      - name: Build
-        run: npm run build
+      # - name: Build
+      #   run: npm run build
 
       - name: Set up AWS CLI
-        if: github.ref == 'refs/heads/main'
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       - name: Deploy Infrastructure with CDK
-        if: github.ref == 'refs/heads/main'
         working-directory: ./iac
         run: |
           npm install

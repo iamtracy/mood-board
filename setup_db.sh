@@ -6,7 +6,7 @@
 : "${POSTGRES_PASSWORD:=postgres}"  # Default password for PostgreSQL
 : "${DB_HOST:=localhost}"  # Host for PostgreSQL
 : "${DATABASE_PORT:=5432}"  # Port for PostgreSQL
-: "${POSTGRES_DB:=mood-board}"  # Default database name for PostgreSQL
+: "${POSTGRES_DB:=moodboard}"  # Default database name for PostgreSQL
 
 # Load environment variables from .env file if it exists
 if [ -f .env ]; then
@@ -29,7 +29,7 @@ start_postgres() {
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
     -e POSTGRES_DB=$POSTGRES_DB \
     -d -p $DATABASE_PORT:$DATABASE_PORT \
-    postgres:latest
+    postgres:17.2
 
   echo "PostgreSQL is now running on $DB_HOST:$DATABASE_PORT with user $POSTGRES_USER"
 }

@@ -26,11 +26,11 @@ export class IacStack extends cdk.Stack {
         },
       ],
     })
-    
+
     const cluster = new ecs.Cluster(this, 'MoodBoardCluster', {
       vpc,
     })
-
+    
     const dbPassword = new secretsmanager.Secret(this, 'MoodBoardDbPassword', {
       generateSecretString: {
         secretStringTemplate: JSON.stringify({ username: 'postgres' }),
@@ -41,46 +41,80 @@ export class IacStack extends cdk.Stack {
       },
     })
 
+    const dbSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
+      vpc,
+      description: 'Allow communication from ECS tasks to PostgreSQL',
+    })
+
+    const rdsVersion = rds.DatabaseInstanceEngine.postgres({
+      version: rds.PostgresEngineVersion.VER_17_2,
+    })
+    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+      engine: rdsVersion,
+      parameters: {
+        log_statement: 'all',
+        log_min_duration_statement: '0',
+      },
+    })
+    parameterGroup.addParameter('rds.force_ssl', '0')
+
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
-      engine: rds.DatabaseInstanceEngine.POSTGRES,
+      engine: rdsVersion,
       instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO
+        ec2.InstanceClass.BURSTABLE3,
+        ec2.InstanceSize.SMALL
       ),
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
-      databaseName: 'mood-board',
+      databaseName: 'moodboard',
       allocatedStorage: 20,
-      securityGroups: [new ec2.SecurityGroup(this, 'RdsSecurityGroup', { vpc })],
+      securityGroups: [dbSecurityGroup],
       subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {
         vpc,
         description: 'Subnets for MoodBoard RDS instance',
       }),
-      publiclyAccessible: false,
+      parameterGroup
     })
+  
+    const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
+      vpc,
+      allowAllOutbound: true,
+      description: 'Allow communication from ECS tasks',
+    })
+    
+    dbSecurityGroup.addIngressRule(
+      ecsSecurityGroup,
+      ec2.Port.tcp(5432),
+      'Allow ECS tasks to connect to PostgreSQL'
+    )
     
     new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       cluster,
       cpu: 512,
+      securityGroups: [ecsSecurityGroup],
       desiredCount: 1,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
-        containerPort: +(process.env.PORT!),
+        containerPort: 3000,
         containerName: 'mood-board-container',
         environment: {
           DB_HOST: dbInstance.dbInstanceEndpointAddress,
-          DB_PORT: '5432',
+          DB_PORT: dbInstance.dbInstanceEndpointPort,
           POSTGRES_USERNAME: 'postgres',
-          POSTGRES_DB: 'mood-board',
-          POSTGRES_PASSWORD: dbPassword.secretValue.unsafeUnwrap(),
+          POSTGRES_DB: 'moodboard',
           NODE_ENV: 'production'
+        },
+        secrets: {
+          POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
       },
     })
   }
 }
 
+// TODO: Add the following code to the IacStack class once you have the domain set up
 // import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 // import * as route53 from 'aws-cdk-lib/aws-route53'
 // import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
