@@ -26,6 +26,22 @@ export class IacStack extends cdk.Stack {
         },
       ],
     })
+
+    const ecsSecurityGroup = new ec2.SecurityGroup(this, 'EcsSecurityGroup', {
+      vpc,
+      description: 'Allow communication from ECS tasks',
+    })
+
+    const rdsSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
+      vpc,
+      description: 'Allow communication from ECS tasks to PostgreSQL',
+    })
+
+    rdsSecurityGroup.addIngressRule(
+      ecsSecurityGroup,
+      ec2.Port.tcp(5432),
+      'Allow ECS tasks to connect to PostgreSQL'
+    )
     
     const cluster = new ecs.Cluster(this, 'MoodBoardCluster', {
       vpc,
@@ -53,14 +69,21 @@ export class IacStack extends cdk.Stack {
       credentials: rds.Credentials.fromSecret(dbPassword),
       databaseName: 'moodboard',
       allocatedStorage: 20,
-      securityGroups: [new ec2.SecurityGroup(this, 'RdsSecurityGroup', { vpc })],
+      securityGroups: [rdsSecurityGroup],
       subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {
         vpc,
         description: 'Subnets for MoodBoard RDS instance',
       }),
       publiclyAccessible: false,
     })
-    
+
+    const secretValueString = dbPassword.secretValue.unsafeUnwrap()
+    const secretObject = JSON.parse(secretValueString)
+
+    console.log('secretObject', secretObject)
+    console.log('username', secretObject.username)
+    console.log('password', secretObject.password)
+
     new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       cluster,
       cpu: 512,
@@ -74,13 +97,14 @@ export class IacStack extends cdk.Stack {
         environment: {
           DB_HOST: dbInstance.dbInstanceEndpointAddress,
           DB_PORT: dbInstance.dbInstanceEndpointPort,
-          POSTGRES_USERNAME: 'postgres',
+          POSTGRES_USERNAME: secretObject.username,
+          POSTGRES_PASSWORD: secretObject.password, 
           POSTGRES_DB: 'moodboard',
           NODE_ENV: 'production'
         },
-        secrets: {
-          POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
-        },
+        // secrets: {
+        //   POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
+        // },
       },
     })
   }
