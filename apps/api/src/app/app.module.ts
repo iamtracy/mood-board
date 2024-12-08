@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 
 import { join } from 'path'
 
 import { MoodModule } from './mood/mood.module'
-import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AppConfig, DatabaseConfig } from '../config'
 
 @Module({
@@ -35,7 +35,7 @@ import { AppConfig, DatabaseConfig } from '../config'
         username: configService.get('POSTGRES_USERNAME'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
-        entities: [__dirname + './**/*.entity{.ts,.js}'],
+        entities: [__dirname + './**/*.entity.ts'],
         synchronize: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],

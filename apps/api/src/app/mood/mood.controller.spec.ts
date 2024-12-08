@@ -18,7 +18,6 @@ describe('MoodController', () => {
     it.skip('should return "Hello API"', () => {
       const appController = app.get<MoodController>(MoodController)
       expect(appController.findAll()).toEqual([])
-
     })
   })
 })

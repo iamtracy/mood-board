@@ -30,4 +30,5 @@ ENV SUBDOMAIN=${SUBDOMAIN}
 
 EXPOSE ${PORT}
 
-CMD npx ts-node -P dist/db/tsconfig.migration.json --require tsconfig-paths/register /app/node_modules/typeorm/cli.js migration:run -d dist/db/typeorm.config.ts &&  node dist/api/main
+# npx ts-node -P dist/db/tsconfig.migration.json --require tsconfig-paths/register /app/node_modules/typeorm/cli.js migration:run -d dist/db/typeorm.config.ts &&
+CMD node dist/api/main

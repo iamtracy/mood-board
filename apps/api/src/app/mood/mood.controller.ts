@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { MoodService } from './mood.service';
-import { ApiResponse, ApiTags,  } from '@nestjs/swagger';
-import { MoodEntity } from './mood.entity';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { MoodService } from './mood.service'
+import { ApiResponse, ApiTags,  } from '@nestjs/swagger'
+import { MoodEntity } from './mood.entity'
 
 @ApiTags('mood')
 @Controller('mood')
