@@ -22,12 +22,6 @@ ENV NODE_ENV=production
 ARG PORT=3000
 ENV PORT=${PORT}
 
-ARG DOMAIN='mood-board.me'
-ENV DOMAIN=${DOMAIN}
-
-ARG SUBDOMAIN='dev'
-ENV SUBDOMAIN=${SUBDOMAIN}
-
 EXPOSE ${PORT}
 
 # npx ts-node -P dist/db/tsconfig.migration.json --require tsconfig-paths/register /app/node_modules/typeorm/cli.js migration:run -d dist/db/typeorm.config.ts &&
