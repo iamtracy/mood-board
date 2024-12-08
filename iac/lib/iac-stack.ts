@@ -46,10 +46,20 @@ export class IacStack extends cdk.Stack {
       description: 'Allow communication from ECS tasks to PostgreSQL',
     })
 
+    const rdsVersion = rds.DatabaseInstanceEngine.postgres({
+      version: rds.PostgresEngineVersion.VER_17_2,
+    })
+    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+      engine: rdsVersion,
+      parameters: {
+        log_statement: 'all',
+        log_min_duration_statement: '0',
+      },
+    })
+    parameterGroup.addParameter('rds.force_ssl', '0')
+
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
-      engine: rds.DatabaseInstanceEngine.postgres({
-        version: rds.PostgresEngineVersion.VER_17_2,
-      }),
+      engine: rdsVersion,
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.BURSTABLE3,
         ec2.InstanceSize.SMALL
@@ -63,9 +73,8 @@ export class IacStack extends cdk.Stack {
         vpc,
         description: 'Subnets for MoodBoard RDS instance',
       }),
-      publiclyAccessible: false,
+      parameterGroup
     })
-
   
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
       vpc,
