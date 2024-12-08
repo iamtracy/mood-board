@@ -67,11 +67,12 @@ export class IacStack extends cdk.Stack {
     })
 
     const secretValueString = dbPassword.secretValue.unsafeUnwrap()
-    const secretObject = JSON.parse(secretValueString)
 
-    console.log('secretObject', secretObject)
-    console.log('username', secretObject.username)
-    console.log('password', secretObject.password)
+    console.log('secretObject', secretValueString)
+    // @ts-expect-error secretValueString is a string
+    console.log('username', secretValueString.username)
+    // @ts-expect-error secretValueString is a string
+    console.log('password', secretValueString.password)
 
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
       vpc,
