@@ -101,9 +101,6 @@ export class IacStack extends cdk.Stack {
           POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
       },
-      taskDefinition: new ecs.FargateTaskDefinition(this, 'MoodBoardTaskDefinition', {
-        taskRole: ecsTaskRole,
-      }),
     })
   }
 }
