@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { join } from 'path'
 
 import { AppConfig, DatabaseConfig } from '../config'
+import { MoodModule } from './mood/mood.module'
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AppConfig, DatabaseConfig } from '../config'
       }),
       inject: [ConfigService],
     }),
+    MoodModule,
   ],
 })
 export class AppModule {}

@@ -3,7 +3,7 @@ name: Build and Deploy IaC with Docker
 on:
   push:
     branches:
-      - database
+      - migration
   pull_request:
     branches:
       - main
