@@ -5,7 +5,6 @@ import * as ecs from 'aws-cdk-lib/aws-ecs'
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
-import * as iam from 'aws-cdk-lib/aws-iam'
 
 import * as path from 'path'
 
@@ -61,24 +60,6 @@ export class IacStack extends cdk.Stack {
       }),
       publiclyAccessible: false,
     })
-
-    const ecsTaskRole = new iam.Role(this, 'EcsTaskRole', {
-      assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
-      managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite'),
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerServiceFullAccess')
-      ]
-    })
-
-    const secretsManagerPolicy = new iam.Policy(this, 'SecretsManagerPolicy', {
-      statements: [
-        new iam.PolicyStatement({
-          actions: ['secretsmanager:GetSecretValue'],
-          resources: [dbPassword.secretArn],
-        }),
-      ],
-    })
-    ecsTaskRole.attachInlinePolicy(secretsManagerPolicy)
     
     new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       cluster,
