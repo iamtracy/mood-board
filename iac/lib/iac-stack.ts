@@ -101,6 +101,7 @@ export class MoodStack extends cdk.Stack {
       cluster,
       cpu: 512,
       securityGroups: [ecsSecurityGroup],
+      loadBalancerName: 'mood-board-alb',
       desiredCount: 1,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
