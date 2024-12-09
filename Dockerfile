@@ -15,6 +15,7 @@ WORKDIR /app
 COPY --from=build /app/dist/apps ./dist
 COPY --from=build /app/db ./db
 COPY --from=build /app/tsconfig.migration.json ./tsconfig.migration.json 
+COPY --from=build /app/apps/api/src/app/entities ./entities
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/scripts/migrate-and-start.sh ./scripts/migrate-and-start.sh
 

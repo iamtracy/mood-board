@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { MoodEntity } from './mood.entity'
+import { MoodEntity } from '../entities/mood.entity'
 import { MoodService } from './mood.service'
 import { MoodController } from './mood.controller'
 

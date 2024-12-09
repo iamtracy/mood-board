@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { MoodEntity } from './mood.entity'
+import { MoodEntity } from '../entities/mood.entity'
 
 @Injectable()
 export class MoodService {
