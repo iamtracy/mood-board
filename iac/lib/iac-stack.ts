@@ -67,7 +67,7 @@ export class IacStack extends cdk.Stack {
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
       databaseName: 'moodboard',
-      allocatedStorage: 5,
+      allocatedStorage: 20,
       securityGroups: [dbSecurityGroup],
       subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {
         vpc,
