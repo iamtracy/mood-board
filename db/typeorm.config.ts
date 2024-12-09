@@ -8,9 +8,9 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 
 const configService = new ConfigService()
 
-const entitiesPath = isDevelopment
-  ? `${__dirname}/../entities/**/*.entity.{ts,js}`
-  : '/app/entities/**/*.entity.{ts,js}'
+// const entitiesPath = isDevelopment
+//   ? `${__dirname}/../entities/**/*.entity.{ts,js}`
+//   : '/app/entities/**/*.entity.{ts,js}'
 
 const migrationsPath = isDevelopment
   ? `${__dirname}/../db/migrations/*.{ts,js}`
@@ -18,7 +18,7 @@ const migrationsPath = isDevelopment
 
 export default new DataSource({
   database: configService.get('POSTGRES_DB'),
-  entities: [entitiesPath],
+  entities: ['/app/entities/mood.entities'],
   host: configService.get('DB_HOST'),
   logging: isDevelopment,
   migrations: [migrationsPath],
