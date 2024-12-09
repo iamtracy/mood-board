@@ -12,16 +12,16 @@ const configService = new ConfigService()
 //   ? `${__dirname}/../entities/**/*.entity.{ts,js}`
 //   : '/app/entities/**/*.entity.{ts,js}'
 
-const migrationsPath = isDevelopment
-  ? `${__dirname}/../db/migrations/*.{ts,js}`
-  : '/app/db/migrations/*.{ts,js}'
+// const migrationsPath = isDevelopment
+//   ? `${__dirname}/../db/migrations/*.{ts,js}`
+//   : '/app/db/migrations/*.{ts,js}'
 
 export default new DataSource({
   database: configService.get('POSTGRES_DB'),
-  entities: ['/app/entities/mood.entities'],
+  entities: ['/app/entities/mood.entity.ts'],
   host: configService.get('DB_HOST'),
   logging: isDevelopment,
-  migrations: [migrationsPath],
+  migrations: ['/app/db/migrations/*-migration.ts'],
   password: configService.get('POSTGRES_PASSWORD'),
   port: +(configService.get('DB_PORT') ?? 5432),
   synchronize: isDevelopment,

@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config'
+import { MoodEntity } from '../app/entities/mood.entity'
 
 const {
     DB_HOST,
@@ -13,8 +14,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 export default registerAs('database', () => ({
     type: 'postgres',
     logging:  isDevelopment,
-    migrations: [`${__dirname}/../../../db/migrations/*.ts`],
-    entities: [`${__dirname}/../app/**/*.entity.ts`],
+    entities: [MoodEntity],
     host: DB_HOST,
     port: DB_PORT,
     username: POSTGRES_USERNAME,
