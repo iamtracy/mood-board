@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm install -g nx && npm install
 
 COPY . .
+RUN npx tsc -p /app/tsconfig.migration.json
 RUN npm run build
 
 FROM node:22
@@ -14,7 +15,6 @@ WORKDIR /app
 
 COPY --from=build /app/dist/apps ./dist
 COPY --from=build /app/db ./dist/db
-COPY --from=build /app/tsconfig.migration.json ./dist/db/tsconfig.migration.json
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/scripts/migrate-and-start.sh ./scripts/migrate-and-start.sh
 

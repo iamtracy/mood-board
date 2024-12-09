@@ -1,15 +1,23 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "skipLibCheck": true,
-    "lib": ["ES2020"],
-    "types": ["node"],
-    "module": "ESNext",
-    "target": "ESNext",
-    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "lib": ["ES2020"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "target": "ESNext",
+    "types": ["node"]
   },
-  "include": [ "db/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "db/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

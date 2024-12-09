@@ -13,7 +13,8 @@ log_message "Starting migration and application startup process..."
 
 log_message "Running database migration..."
 
-npx ts-node -P /app/dist/db/tsconfig.migration.json --require tsconfig-paths/register /app/node_modules/typeorm/cli.js migration:run -d /app/dist/db/typeorm.config.ts
+npx typeorm migration:run -d /app/dist/db/typeorm.config.js
+
 MIGRATION_STATUS=$?
 
 if [ $MIGRATION_STATUS -ne 0 ]; then
