@@ -8,7 +8,7 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
 
 import * as path from 'path'
 
-export class IacStack extends cdk.Stack {
+export class MoodStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
     
@@ -114,7 +114,7 @@ export class IacStack extends cdk.Stack {
   }
 }
 
-// TODO: Add the following code to the IacStack class once you have the domain set up
+// TODO: Add the following code to the MoodStack class once you have the domain set up
 // import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 // import * as route53 from 'aws-cdk-lib/aws-route53'
 // import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
