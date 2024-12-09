@@ -13,7 +13,7 @@ log_message "Starting migration and application startup process..."
 
 log_message "Running database migration..."
 
-npx typeorm-ts-node-esm migration:run -d /app/dist/db/typeorm.config.ts
+npx typeorm-ts-node-commonjs migration:run -d /app/db/typeorm.config.ts
 
 MIGRATION_STATUS=$?
 

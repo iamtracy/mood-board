@@ -1,17 +1,24 @@
-import { ConfigService } from '@nestjs/config'
-import { join } from 'path'
 import { DataSource } from 'typeorm'
 
-const configService = new ConfigService()
+const {
+  POSTGRES_DB,
+  POSTGRES_PASSWORD,
+  POSTGRES_USERNAME,
+  DB_HOST,
+  DB_PORT = 5432,
+  NODE_ENV,
+} = process.env
+
+const isDevelopment = NODE_ENV === 'development'
 
 export default new DataSource({
-  database: configService.get('POSTGRES_DB'),
-  entities: [join('/apps/api/**/*.entity.{ts,js}')],
-  host: configService.get('DB_HOST'),
-  logging: configService.get('NODE_ENV') === 'development',
-  password: configService.get('POSTGRES_PASSWORD'),
-  port: configService.get('DB_PORT'),
-  synchronize: configService.get('NODE_ENV') === 'development',
+  database: POSTGRES_DB,
+  migrations: ['/apps/db/migrations/*-migration.{ts,js}'],
+  host: DB_HOST,
+  logging: isDevelopment,
+  password: POSTGRES_PASSWORD,
+  port: +DB_PORT,
+  synchronize: isDevelopment,
   type: 'postgres',
-  username: configService.get('POSTGRES_USERNAME'),
+  username: POSTGRES_USERNAME,
 })
