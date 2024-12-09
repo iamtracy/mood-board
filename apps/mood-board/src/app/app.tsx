@@ -27,7 +27,7 @@ export function App() {
       <div>
         <h2>Data from API:</h2>
         <pre>{JSON.stringify(data, null, 2)}</pre>
-        <button onClick={() => createMoodMutation.mutate()}>Create Happy</button>
+        <button onClick={() => createMoodMutation.mutate()}>Create One Happy</button>
       </div>
     </div>
   )
