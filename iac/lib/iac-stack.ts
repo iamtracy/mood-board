@@ -5,7 +5,6 @@ import * as ecs from 'aws-cdk-lib/aws-ecs'
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
-
 import * as path from 'path'
 
 export class MoodStack extends cdk.Stack {
@@ -13,6 +12,7 @@ export class MoodStack extends cdk.Stack {
     super(scope, id, props)
     
     const vpc = new ec2.Vpc(this, 'Vpc', {
+      vpcName: 'mood-board-vpc',
       maxAzs: 2,
       natGateways: 1,
       subnetConfiguration: [
@@ -28,10 +28,13 @@ export class MoodStack extends cdk.Stack {
     })
 
     const cluster = new ecs.Cluster(this, 'MoodBoardCluster', {
+      clusterName: 'mood-board-cluster',
       vpc,
     })
     
     const dbPassword = new secretsmanager.Secret(this, 'MoodBoardDbPassword', {
+      description: 'Password for the MoodBoard RDS instance',
+      secretName: 'mood-board-db-password',
       generateSecretString: {
         secretStringTemplate: JSON.stringify({ username: 'postgres' }),
         excludePunctuation: true,
@@ -44,6 +47,7 @@ export class MoodStack extends cdk.Stack {
     const dbSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
       vpc,
       description: 'Allow communication from ECS tasks to PostgreSQL',
+      securityGroupName: 'mood-board-rds-sg',
     })
 
     const rdsVersion = rds.DatabaseInstanceEngine.postgres({
@@ -51,6 +55,8 @@ export class MoodStack extends cdk.Stack {
     })
     const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
       engine: rdsVersion,
+      description: 'Custom parameter group for the MoodBoard RDS instance',
+      name: 'mood-board-postgres-parameter-group',
       parameters: {
         log_statement: 'all',
         log_min_duration_statement: '0',
@@ -60,6 +66,7 @@ export class MoodStack extends cdk.Stack {
 
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
       engine: rdsVersion,
+      instanceIdentifier: 'mood-board-rds',
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.BURSTABLE3,
         ec2.InstanceSize.SMALL
@@ -80,6 +87,7 @@ export class MoodStack extends cdk.Stack {
       vpc,
       allowAllOutbound: true,
       description: 'Allow communication from ECS tasks',
+      securityGroupName: 'mood-board-ecs-sg',
     })
     
     dbSecurityGroup.addIngressRule(
@@ -89,6 +97,7 @@ export class MoodStack extends cdk.Stack {
     )
     
     new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
+      serviceName: 'mood-board-service',
       cluster,
       cpu: 512,
       securityGroups: [ecsSecurityGroup],

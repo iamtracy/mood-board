@@ -1,4 +1,4 @@
-name: Build and Deploy IaC with Docker
+name: Build and Deploy MoodStack with Docker
 
 on:
   push:
