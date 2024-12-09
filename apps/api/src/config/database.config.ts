@@ -10,10 +10,16 @@ const {
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 
+const entitiesPath = (
+    isDevelopment
+    ? `${__dirname}/../app/entities/**/*.entity.{ts,js}`
+    : '/app/entities/**/*.entity.{ts,js}'
+)
+
 export default registerAs('database', () => ({
     type: 'postgres',
     logging:  isDevelopment,
-    entities: [`${__dirname}/../app/entities/**/*.entity.{ts,js}`],
+    entities: [entitiesPath],
     host: DB_HOST,
     port: DB_PORT,
     username: POSTGRES_USERNAME,
