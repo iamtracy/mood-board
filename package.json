@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "nx": "npx nx",
-    "predev": "./setup_db.sh start",
+    "predev": "./scripts/setup_db.sh start",
     "dev": "npx nx run-many --target=serve",
     "build": "nx run-many --target=build",
     "build:migrations": "tsc -p tsconfig.migration.json",
