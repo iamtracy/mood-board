@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "lib": ["ES2020"],
+    "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "node",
     "skipDefaultLibCheck": true,

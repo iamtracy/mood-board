@@ -1,30 +1,17 @@
+import { ConfigService } from '@nestjs/config'
+import { join } from 'path'
 import { DataSource } from 'typeorm'
-import { config } from 'dotenv'
-import * as path from 'path'
 
-config()
+const configService = new ConfigService()
 
 export default new DataSource({
+  database: configService.get('POSTGRES_DB'),
+  entities: [join('/apps/api/**/*.entity.{ts,js}')],
+  host: configService.get('DB_HOST'),
+  logging: configService.get('NODE_ENV') === 'development',
+  password: configService.get('POSTGRES_PASSWORD'),
+  port: configService.get('DB_PORT'),
+  synchronize: configService.get('NODE_ENV') === 'development',
   type: 'postgres',
-  host: process.env.DB_HOST,
-  port: +(process.env.DB_PORT ?? 5432),
-  username: process.env.POSTGRES_USERNAME,
-  password: process.env.POSTGRES_PASSWORD,
-  database: process.env.POSTGRES_DB,
-  entities: [path.join('/apps/api/**/*.entity.{ts,js}')],
-  synchronize: process.env.NODE_ENV === 'development',
-  logging: process.env.NODE_ENV === 'development',
+  username: configService.get('POSTGRES_USERNAME'),
 })
-
-// export const typeOrmConfig = () => ({
-  // type: 'postgres',
-  // host: configService.get('DB_HOST'),
-  // port: configService.get('DB_PORT'),
-  // username: configService.get('POSTGRES_USERNAME'),
-  // password: configService.get('POSTGRES_PASSWORD'),
-  // database: configService.get('POSTGRES_DB'),
-  // entities: [path.join(__dirname, '../apps/api/**/*.entity.{ts,js}')],
-  // synchronize: configService.get('NODE_ENV') === 'development',
-  // logging: configService.get('NODE_ENV') === 'development',
-  // migrations: [path.join(__dirname, '**/migrations/*{.ts,.js}')],
-// })

@@ -10,12 +10,12 @@
     "test:unit:ci": "nx run-many --target=test --coverage --ci",
     "lint": "nx run-many --target=lint",
     "test:unit": "nx affected:test --all --parallel --watch",
-    "typeorm": "ts-node -P ./tsconfig.migration.json  --require tsconfig-paths/register ./node_modules/typeorm/cli",
-    "migration:run": "npm run typeorm migration:run -- -d ./db/typeorm.config.ts",
-    "migration:generate": "npm run typeorm -- -d ./db/typeorm.config.ts migration:generate ./db/migrations/migration",
-    "migration:create": "npm run typeorm -- migration:create ./db/migrations/$npm_config_name",
-    "migration:revert": "npm run typeorm -- -d ./db/typeorm.config.ts migration:revert",
-    "migration:show": "npm run typeorm -- migration:show -d ./db/typeorm.config.ts"
+    "migration": "typeorm-ts-node-esm",
+    "migration:generate": "npm run migration migration:generate -- -d ./db/typeorm.config.ts",
+    "migration:migrate": "npm run migration migration:run  -d ./db/typeorm.config.ts",
+    "migration:revert": "npm run migration migration:revert  -d ./db/typeorm.config.ts",
+    "migration:drop": "npm run migration schema:drop  -d ./db/typeorm.config.ts",
+    "migration:show": "npm run migration schema:drop -d ./db/typeorm.config.ts"
   },
   "private": true,
   "dependencies": {
@@ -89,6 +89,7 @@
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.3.0",
+    "typeorm-ts-node-esm": "^0.3.20",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.13.0",
     "webpack-cli": "^5.1.4"
