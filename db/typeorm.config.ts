@@ -10,10 +10,10 @@ const configService = new ConfigService()
 
 export default new DataSource({
   database: configService.get('POSTGRES_DB'),
-  entities: [`${__dirname}/../entities/**/*.entity.{ts,js}`],
+  entities: ['/app/entities/**/*.entity.{ts,js}'],
   host: configService.get('DB_HOST'),
   logging: isDevelopment,
-  migrations: [`${__dirname}/../db/migrations/*.ts`],
+  migrations: ['/app/db/migrations/*.ts'],
   password: configService.get('POSTGRES_PASSWORD'),
   port: +(configService.get('DB_PORT') ?? 5432),
   synchronize: isDevelopment,
