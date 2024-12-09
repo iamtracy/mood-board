@@ -7,7 +7,6 @@ import { join } from 'path'
 
 import { AppConfig, DatabaseConfig } from '../config'
 import { MoodModule } from './mood/mood.module'
-import { MoodEntity } from './mood/mood.entity'
 import { HealthModule } from './health/health.module'
 
 @Module({
@@ -31,19 +30,7 @@ import { HealthModule } from './health/health.module'
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('POSTGRES_USERNAME'),
-        password: configService.get('POSTGRES_PASSWORD'),
-        database: configService.get('POSTGRES_DB'),
-        entities: [MoodEntity],
-        synchronize: configService.get('NODE_ENV') === 'development',
-        extra: {
-          ssl: {
-            rejectUnauthorized: false,
-          }
-        }
+        ...configService.get('database'),
       }),
       inject: [ConfigService],
     }),
