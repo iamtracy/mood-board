@@ -7,7 +7,7 @@
 test('SQS Queue Created', () => {
 //   const app = new cdk.App();
 //     // WHEN
-//   const stack = new Iac.IacStack(app, 'MyTestStack');
+//   const stack = new Iac.MoodStack(app, 'MyTestStack');
 //     // THEN
 //   const template = Template.fromStack(stack);
 

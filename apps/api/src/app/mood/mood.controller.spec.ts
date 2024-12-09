@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { MoodController } from './mood.controller'
 import { MoodService } from './mood.service'
-import { MoodEntity } from './mood.entity'
+import { MoodEntity } from '../entities/mood.entity'
 
 describe('MoodController', () => {
   let app: TestingModule

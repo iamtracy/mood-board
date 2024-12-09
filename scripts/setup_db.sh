@@ -2,11 +2,12 @@
 
 # Default values for environment variables if not set
 : "${CONTAINER_NAME:=postgres-db}"
-: "${POSTGRES_USER:=postgres}"  # Default username for PostgreSQL
-: "${POSTGRES_PASSWORD:=postgres}"  # Default password for PostgreSQL
+: "${POSTGRES_USER:=moodyUser}"  # Default username for PostgreSQL
+: "${POSTGRES_PASSWORD:=SuperSecretPassword123}"  # Default password for PostgreSQL
 : "${DB_HOST:=localhost}"  # Host for PostgreSQL
 : "${DATABASE_PORT:=5432}"  # Port for PostgreSQL
 : "${POSTGRES_DB:=moodboard}"  # Default database name for PostgreSQL
+: "${NODE_ENV:=development}"  # Default Node environment
 
 # Load environment variables from .env file if it exists
 if [ -f .env ]; then
@@ -28,6 +29,8 @@ start_postgres() {
     -e POSTGRES_USER=$POSTGRES_USER \
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
     -e POSTGRES_DB=$POSTGRES_DB \
+    -e POSTGRES_DB=$POSTGRES_DB \
+    -e NODE_ENV=$NODE_ENV \
     -d -p $DATABASE_PORT:$DATABASE_PORT \
     postgres:17.2
 

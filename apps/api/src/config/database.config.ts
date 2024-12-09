@@ -1,17 +1,23 @@
-import { ConfigService, registerAs } from '@nestjs/config'
+import { registerAs } from '@nestjs/config'
 
-const configService = new ConfigService()
+const {
+    DB_HOST,
+    DB_PORT,
+    POSTGRES_USERNAME,
+    POSTGRES_PASSWORD,
+    POSTGRES_DB,
+} = process.env
+
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 export default registerAs('database', () => ({
+    autoLoadEntities: true,
+    database: POSTGRES_DB,
+    host: DB_HOST,
+    logging:  isDevelopment,
+    password: POSTGRES_PASSWORD,
+    port: DB_PORT,
+    synchronize: isDevelopment,
     type: 'postgres',
-    entities: [`${__dirname}/../**/*.entity.ts`],
-    logging:  configService.get('NODE_ENV') === 'development',
-    migrations: [`${__dirname}/../../../db/migrations/*.ts`],
-    migrationsTableName: 'migrations',
-    host: configService.get('DB_HOST'),
-    port: configService.get('DB_PORT'),
-    username: configService.get('POSTGRES_USERNAME'),
-    password: configService.get('POSTGRES_PASSWORD'),
-    database: configService.get('POSTGRES_DB'),
-    synchronize: configService.get('NODE_ENV') === 'development',
+    username: POSTGRES_USERNAME,
 }))
