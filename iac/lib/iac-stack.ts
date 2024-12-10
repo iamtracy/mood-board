@@ -7,6 +7,7 @@ import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
 import * as route53 from 'aws-cdk-lib/aws-route53'
 import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
+import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as path from 'path'
 
 const DOMAIN = 'is-mood.com'
@@ -98,9 +99,15 @@ export class MoodStack extends cdk.Stack {
       ec2.Port.tcp(5432),
       'Allow ECS tasks to connect to PostgreSQL'
     )
+
+    const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
+      domainName: `*.${DOMAIN}`,
+      validation: acm.CertificateValidation.fromDns(),
+    })
     
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
+      certificate,
       cluster,
       cpu: 512,
       securityGroups: [ecsSecurityGroup],
@@ -132,6 +139,7 @@ export class MoodStack extends cdk.Stack {
     new route53.ARecord(this, 'AliasRecord', {
       recordName: 'staging',
       ttl: cdk.Duration.minutes(5),
+      comment: 'DNS record for the MoodBoard service',
       target: route53.RecordTarget.fromAlias(
         new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)
       ),
