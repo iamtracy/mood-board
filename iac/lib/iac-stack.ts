@@ -5,6 +5,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs'
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
+import * as iam from 'aws-cdk-lib/aws-iam'
 import * as path from 'path'
 
 export class MoodStack extends cdk.Stack {
@@ -85,7 +86,7 @@ export class MoodStack extends cdk.Stack {
   
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
       vpc,
-      allowAllOutbound: true,
+      allowAllOutbound: false,
       description: 'Allow communication from ECS tasks',
       securityGroupName: 'mood-board-ecs-sg',
     })
@@ -119,6 +120,22 @@ export class MoodStack extends cdk.Stack {
         secrets: {
           POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
+        taskRole: new iam.Role(this, 'MoodBoardEcsTaskRole', {
+          assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+          inlinePolicies: {
+            SecretsManagerPolicy: new iam.PolicyDocument({
+              statements: [
+                new iam.PolicyStatement({
+                  effect: iam.Effect.ALLOW,
+                  actions: ['secretsmanager:GetSecretValue'],
+                  resources: [
+                    dbPassword.secretArn,
+                  ],
+                }),
+              ],
+            }),
+          },
+        })
       },
     })
 
