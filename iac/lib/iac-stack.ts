@@ -142,7 +142,7 @@ export class MoodStack extends cdk.Stack {
     })
 
     new route53.ARecord(this, 'MoodAliasRecord', {
-      recordName: 'dev',
+      recordName: 'staging',
       target: route53.RecordTarget.fromAlias(
         new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)
       ),
