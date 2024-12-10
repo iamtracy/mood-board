@@ -3,19 +3,19 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "npm run nx run-many --target=build",
-    "dev": "npm run nx run-many --target=serve",
+    "build": "nx run-many --target=build",
+    "dev": "npx nx run-many --target=serve",
     "init:db": "./scripts/setup_db.sh start",
-    "lint": "npm run run-many --target=lint",
+    "lint": "nx run-many --target=lint",
+    "nx": "npx nx",
+    "test:unit:ci": "nx run-many --target=test --coverage --ci",
+    "test:unit": "nx affected:test --all --parallel --watch",
     "migration:create": "npm run migration -- migration:create ./db/migrations/migration",
     "migration:generate": "npm run migration -- -d ./db/typeorm.config.ts migration:generate ./db/migrations/migration",
     "migration:revert": "npm run migration -- -d ./db/typeorm.config.ts migration:revert",
     "migration:run": "npm run migration migration:run -- -d ./db/typeorm.config.ts",
     "migration:show": "npm run migration -- migration:show -d ./db/typeorm.config.ts",
-    "migration": "ts-node -P tsconfig.migration.json --require tsconfig-paths/register ./node_modules/typeorm/cli",
-    "nx": "nx",
-    "test:unit:ci": "npm run run-many --target=test --coverage --ci",
-    "test:unit": "npm run affected:test --all --parallel --watch"
+    "migration": "ts-node -P tsconfig.migration.json --require tsconfig-paths/register ./node_modules/typeorm/cli"
   },
   "private": true,
   "dependencies": {
