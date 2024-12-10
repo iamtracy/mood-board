@@ -6,7 +6,6 @@ import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
 import * as acm from 'aws-cdk-lib/aws-certificatemanager'
-import * as elb from 'aws-cdk-lib/aws-elasticloadbalancingv2'
 import * as path from 'path'
 
 export class MoodStack extends cdk.Stack {
@@ -96,17 +95,15 @@ export class MoodStack extends cdk.Stack {
       ec2.Port.tcp(5432),
       'Allow ECS tasks to connect to PostgreSQL'
     )
-
-    const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
-      domainName: 'mood-board-alb-1053778799.us-east-1.elb.amazonaws.com',
-      validation: acm.CertificateValidation.fromDns(),
-    })
     
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
       cpu: 512,
-      certificate,
+      certificate: new acm.Certificate(this, 'MoodBoardCertificate', {
+        domainName: 'mood-board-alb-1053778799.us-east-1.elb.amazonaws.com',
+        validation: acm.CertificateValidation.fromDns(),
+      }),
       securityGroups: [ecsSecurityGroup],
       loadBalancerName: 'mood-board-alb',
       desiredCount: 1,
@@ -128,12 +125,6 @@ export class MoodStack extends cdk.Stack {
           POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
       },
-    })
-
-    moodBoardService.loadBalancer.addListener('HttpsListener', {
-      port: 443,
-      certificates: [certificate],
-      defaultAction: elb.ListenerAction.forward([moodBoardService.targetGroup]),
     })
 
     moodBoardService.targetGroup.configureHealthCheck({
