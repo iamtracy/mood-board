@@ -98,6 +98,10 @@ export class MoodStack extends cdk.Stack {
       ec2.Port.tcp(5432),
       'Allow ECS tasks to connect to PostgreSQL'
     )
+
+    const zone = new route53.PublicHostedZone(this, 'MoodPublicZone', {
+      zoneName: DOMAIN,
+    })
     
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
@@ -109,6 +113,9 @@ export class MoodStack extends cdk.Stack {
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
       redirectHTTP: true,
+      protocol: cdk.aws_elasticloadbalancingv2.ApplicationProtocol.HTTPS,
+      domainName: DOMAIN,
+      domainZone: zone,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         containerPort: 3000,
@@ -136,9 +143,7 @@ export class MoodStack extends cdk.Stack {
       target: route53.RecordTarget.fromAlias(
         new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)
       ),
-      zone: new route53.PublicHostedZone(this, 'MoodPublicZone', {
-        zoneName: DOMAIN,
-      }),
+      zone,
     })
   }
 }
