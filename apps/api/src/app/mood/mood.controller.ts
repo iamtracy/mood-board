@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { MoodService } from './mood.service'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { MoodEntity } from '../entities/mood.entity'
@@ -38,6 +38,16 @@ export class MoodController {
     })
     async create(@Body() body: Partial<MoodEntity>): Promise<MoodEntity> {
         return await this.moodService.create(body)
+    }
+
+    @Put()
+    @ApiResponse({
+        status: 200,
+        description: 'Update a mood',
+        type: MoodEntity,
+    })
+    async update(@Body() body: Partial<MoodEntity>): Promise<MoodEntity> {
+        return await this.moodService.update(body.id, body)
     }
 
     @Delete(':id')

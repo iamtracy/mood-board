@@ -22,6 +22,11 @@ export class MoodService {
     return this.moodRepository.save(data)
   }
 
+  async update(id: number, data: Partial<MoodEntity>): Promise<MoodEntity> {
+    await this.moodRepository.update(id, data)
+    return this.moodRepository.findOneOrFail({ where: { id } })
+  }
+
   async delete(id: number): Promise<DeleteResult> {
     return this.moodRepository.delete(id)
   }
