@@ -98,7 +98,7 @@ export class MoodStack extends cdk.Stack {
     )
 
     const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
-      domainName: '*',
+      domainName: 'mood-board-alb-1053778799.us-east-1.elb.amazonaws.com',
       validation: acm.CertificateValidation.fromDns(),
     })
     
@@ -112,6 +112,7 @@ export class MoodStack extends cdk.Stack {
       desiredCount: 1,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
+      redirectHTTP: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         containerPort: 3000,
