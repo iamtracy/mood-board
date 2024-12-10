@@ -1,0 +1,125 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f4f8;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .app {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .mood-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .mood-card {
+    padding: 15px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .mood-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .mood-id {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  button {
+    padding: 8px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .delete-button {
+    background-color: #ff4d4f;
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background-color: #ff1f20;
+  }
+  
+  .create-button {
+    background-color: #28a745;
+    color: white;
+    align-self: center;
+    padding: 12px 25px;
+  }
+  
+  .create-button:hover {
+    background-color: #218838;
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Input Styling */
+  .input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .mood-input {
+    padding: 8px 15px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 200px;
+  }
+  
+  .mood-input:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  .mood-input::placeholder {
+    color: #aaa;
+  }
+  
+  /* Loading and Error States */
+  .loading,
+  .error {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 20px;
+    color: #333;
+  }
+  
+  .error {
+    color: #ff4d4f;
+  }
+  
