@@ -5,20 +5,23 @@ import * as ecs from 'aws-cdk-lib/aws-ecs'
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
+// import * as iam from 'aws-cdk-lib/aws-iam'
 import * as path from 'path'
 
 export class MoodStack extends cdk.Stack {
+  private readonly dbPassword: secretsmanager.Secret
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
     
     const vpc = this.createVpc()
     const cluster = this.createEcsCluster(vpc)
-    const dbPassword = this.createDbPasswordSecret()
-    const dbInstance = this.createRdsInstance(vpc, dbPassword)
+    this.dbPassword = this.createDbPasswordSecret()
+    const dbInstance = this.createRdsInstance(vpc, this.dbPassword)
     const ecsSecurityGroup = this.createEcsSecurityGroup(vpc)
     this.allowEcsToDbAccess(ecsSecurityGroup, dbInstance)
 
-    this.createEcsService(cluster, vpc, dbPassword, dbInstance, ecsSecurityGroup)
+    this.createEcsService(cluster, this.dbPassword, dbInstance, ecsSecurityGroup)
   }
 
   private createVpc(): ec2.Vpc {
@@ -105,17 +108,40 @@ export class MoodStack extends cdk.Stack {
   private createEcsSecurityGroup(vpc: ec2.Vpc): ec2.SecurityGroup {
     return new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
       vpc,
-      allowAllOutbound: false,
+      allowAllOutbound: true,
       description: 'Allow communication from ECS tasks',
       securityGroupName: 'mood-board-ecs-sg',
     })
   }
 
+  // private createEcsTaskRole(): iam.Role {
+  //   const taskRole = new iam.Role(this, 'MoodBoardEcsTaskRole', {
+  //     assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
+  //     inlinePolicies: {
+  //       SecretsManagerPolicy: new iam.PolicyDocument({
+  //         statements: [
+  //           new iam.PolicyStatement({
+  //             effect: iam.Effect.ALLOW,
+  //             actions: ['secretsmanager:GetSecretValue'],
+  //             resources: [
+  //               this.dbPassword.secretArn,
+  //             ],
+  //           }),
+  //         ],
+  //       }),
+  //     },
+  //   })
+  
+  //   return taskRole
+  // }
+
   private allowEcsToDbAccess(ecsSecurityGroup: ec2.SecurityGroup, dbInstance: rds.DatabaseInstance) {
     dbInstance.connections.allowFrom(ecsSecurityGroup, ec2.Port.tcp(5432), 'Allow ECS tasks to connect to PostgreSQL')
   }
 
-  private createEcsService(cluster: ecs.Cluster, vpc: ec2.Vpc, dbPassword: secretsmanager.Secret, dbInstance: rds.DatabaseInstance, ecsSecurityGroup: ec2.SecurityGroup) {
+  private createEcsService(cluster: ecs.Cluster, dbPassword: secretsmanager.Secret, dbInstance: rds.DatabaseInstance, ecsSecurityGroup: ec2.SecurityGroup): void {
+    // const taskRole = this.createEcsTaskRole()
+
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
@@ -139,6 +165,7 @@ export class MoodStack extends cdk.Stack {
         secrets: {
           POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
+        // taskRole,
       },
     })
 
