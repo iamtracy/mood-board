@@ -68,8 +68,8 @@ export class MoodStack extends cdk.Stack {
       engine: rdsVersion,
       instanceIdentifier: 'mood-board-rds',
       instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.BURSTABLE3,
-        ec2.InstanceSize.SMALL
+        ec2.InstanceClass.T3,
+        ec2.InstanceSize.MICRO,
       ),
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
@@ -85,7 +85,6 @@ export class MoodStack extends cdk.Stack {
   
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
       vpc,
-      allowAllOutbound: true,
       description: 'Allow communication from ECS tasks',
       securityGroupName: 'mood-board-ecs-sg',
     })
