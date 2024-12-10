@@ -115,7 +115,6 @@ export class MoodStack extends cdk.Stack {
       desiredCount: 1,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
-      redirectHTTP: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         containerPort: 3000,
@@ -137,16 +136,14 @@ export class MoodStack extends cdk.Stack {
       path: '/api/health',
     })
 
-    const zone = new route53.PublicHostedZone(this, 'MoodPublicZone', {
-      zoneName: DOMAIN,
-    })
-
     new route53.ARecord(this, 'MoodAliasRecord', {
       recordName: 'staging',
       target: route53.RecordTarget.fromAlias(
         new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)
       ),
-      zone,
+      zone: new route53.PublicHostedZone(this, 'MoodPublicZone', {
+        zoneName: DOMAIN,
+      }),
     })
   }
 }
