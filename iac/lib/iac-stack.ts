@@ -64,17 +64,19 @@ export class MoodStack extends cdk.Stack {
     })
     parameterGroup.addParameter('rds.force_ssl', '0')
 
+    const dbInstanceType = this.node.tryGetContext('dbInstanceType') || 't3.micro'
+    const allocatedStorage = this.node.tryGetContext('allocatedStorage') || 20
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
       engine: rdsVersion,
       instanceIdentifier: 'mood-board-rds',
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T3,
-        ec2.InstanceSize.MICRO,
+        dbInstanceType || ec2.InstanceSize.MICRO,
       ),
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
       databaseName: 'moodboard',
-      allocatedStorage: 20,
+      allocatedStorage,
       securityGroups: [dbSecurityGroup],
       subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {
         vpc,
@@ -95,18 +97,21 @@ export class MoodStack extends cdk.Stack {
       'Allow ECS tasks to connect to PostgreSQL'
     )
     
+    const containerPort = this.node.tryGetContext('containerPort') || 3000
+    const cpu = this.node.tryGetContext('cpu') || 512
+    const memory = this.node.tryGetContext('memory') || 2048
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
-      cpu: 512,
+      cpu,
       securityGroups: [ecsSecurityGroup],
       loadBalancerName: 'mood-board-alb',
       desiredCount: 1,
-      memoryLimitMiB: 2048,
+      memoryLimitMiB: memory,
       publicLoadBalancer: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
-        containerPort: 3000,
+        containerPort,
         containerName: 'mood-board-container',
         environment: {
           DB_HOST: dbInstance.dbInstanceEndpointAddress,
