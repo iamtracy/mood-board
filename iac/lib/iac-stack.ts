@@ -6,7 +6,11 @@ import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
 import * as acm from 'aws-cdk-lib/aws-certificatemanager'
+import * as route53 from 'aws-cdk-lib/aws-route53'
+import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
 import * as path from 'path'
+
+const DOMAIN = 'is-mood.com'
 
 export class MoodStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -95,15 +99,17 @@ export class MoodStack extends cdk.Stack {
       ec2.Port.tcp(5432),
       'Allow ECS tasks to connect to PostgreSQL'
     )
+
+    const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
+      domainName: DOMAIN,
+      validation: acm.CertificateValidation.fromDns(),
+    })
     
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
       cpu: 512,
-      certificate: new acm.Certificate(this, 'MoodBoardCertificate', {
-        domainName: 'mood-board-alb-1053778799.us-east-1.elb.amazonaws.com',
-        validation: acm.CertificateValidation.fromDns(),
-      }),
+      certificate,
       securityGroups: [ecsSecurityGroup],
       loadBalancerName: 'mood-board-alb',
       desiredCount: 1,
@@ -130,32 +136,17 @@ export class MoodStack extends cdk.Stack {
     moodBoardService.targetGroup.configureHealthCheck({
       path: '/api/health',
     })
+
+    const zone = new route53.PublicHostedZone(this, 'MoodPublicZone', {
+      zoneName: DOMAIN,
+    })
+
+    new route53.ARecord(this, 'MoodAliasRecord', {
+      recordName: 'dev',
+      target: route53.RecordTarget.fromAlias(
+        new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)
+      ),
+      zone,
+    })
   }
 }
-
-// TODO: Add the following code to the MoodStack class once you have the domain set up
-// import * as acm from 'aws-cdk-lib/aws-certificatemanager'
-// import * as route53 from 'aws-cdk-lib/aws-route53'
-// import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
-
-// const domainName = process.env.DOMAIN!
-// const subDomain = process.env.SUBDOMAIN!
-
-// const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
-//   domainName,
-//   validation: acm.CertificateValidation.fromDns(),
-// })
-
-// const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-//   domainName,
-// })
-// albService.loadBalancer.addListener('Listener', {
-//   port: 443,
-//   certificates: [certificate],
-// })
-
-// new route53.ARecord(this, 'AliasRecord', {
-//   recordName: subDomain,
-//   target: route53.RecordTarget.fromAlias(new route53_targets.LoadBalancerTarget(albService.loadBalancer)),
-//   zone,
-// })
