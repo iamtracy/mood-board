@@ -5,7 +5,6 @@ import * as ecs from 'aws-cdk-lib/aws-ecs'
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
-import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as route53 from 'aws-cdk-lib/aws-route53'
 import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
 import * as path from 'path'
@@ -99,17 +98,11 @@ export class MoodStack extends cdk.Stack {
       ec2.Port.tcp(5432),
       'Allow ECS tasks to connect to PostgreSQL'
     )
-
-    const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
-      domainName: DOMAIN,
-      validation: acm.CertificateValidation.fromDns(),
-    })
     
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
       cpu: 512,
-      certificate,
       securityGroups: [ecsSecurityGroup],
       loadBalancerName: 'mood-board-alb',
       desiredCount: 1,
