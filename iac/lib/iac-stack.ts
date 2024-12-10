@@ -128,15 +128,15 @@ export class MoodStack extends cdk.Stack {
     moodBoardService.targetGroup.configureHealthCheck({
       path: '/api/health',
     })
-
-    new route53.ARecord(this, 'MoodAliasRecord', {
+  
+    new route53.ARecord(this, 'AliasRecord', {
       recordName: 'staging',
-      ttl: cdk.Duration.seconds(60),
+      ttl: cdk.Duration.minutes(5),
       target: route53.RecordTarget.fromAlias(
         new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)
       ),
-      zone: new route53.PublicHostedZone(this, 'MoodPublicZone', {
-        zoneName: DOMAIN,
+      zone: route53.HostedZone.fromLookup(this, 'HostedZone', {
+        domainName: DOMAIN,
       }),
     })
   }
