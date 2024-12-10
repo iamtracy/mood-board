@@ -100,10 +100,11 @@ export class MoodStack extends cdk.Stack {
       'Allow ECS tasks to connect to PostgreSQL'
     )
 
-    const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
-      domainName: `*.${DOMAIN}`,
-      validation: acm.CertificateValidation.fromDns(),
-    })
+    const certificate = acm.Certificate.fromCertificateArn(
+      this,
+      'MoodCertificate',
+      process.env.CERTIFICATE_ARN ?? ''
+    )
     
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
