@@ -11,28 +11,37 @@ export class MoodStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
     
-    const vpc = new ec2.Vpc(this, 'Vpc', {
+    const vpc = this.createVpc()
+    const cluster = this.createEcsCluster(vpc)
+    const dbPassword = this.createDbPasswordSecret()
+    const dbInstance = this.createRdsInstance(vpc, dbPassword)
+    const ecsSecurityGroup = this.createEcsSecurityGroup(vpc)
+    this.allowEcsToDbAccess(ecsSecurityGroup, dbInstance)
+
+    this.createEcsService(cluster, vpc, dbPassword, dbInstance, ecsSecurityGroup)
+  }
+
+  private createVpc(): ec2.Vpc {
+    return new ec2.Vpc(this, 'Vpc', {
       vpcName: 'mood-board-vpc',
       maxAzs: 2,
       natGateways: 1,
       subnetConfiguration: [
-        {
-          name: 'PublicSubnet',
-          subnetType: ec2.SubnetType.PUBLIC,
-        },
-        {
-          name: 'PrivateSubnet',
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-        },
+        { name: 'PublicSubnet', subnetType: ec2.SubnetType.PUBLIC },
+        { name: 'PrivateSubnet', subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       ],
     })
+  }
 
-    const cluster = new ecs.Cluster(this, 'MoodBoardCluster', {
+  private createEcsCluster(vpc: ec2.Vpc): ecs.Cluster {
+    return new ecs.Cluster(this, 'MoodBoardCluster', {
       clusterName: 'mood-board-cluster',
       vpc,
     })
-    
-    const dbPassword = new secretsmanager.Secret(this, 'MoodBoardDbPassword', {
+  }
+
+  private createDbPasswordSecret(): secretsmanager.Secret {
+    return new secretsmanager.Secret(this, 'MoodBoardDbPassword', {
       description: 'Password for the MoodBoard RDS instance',
       secretName: 'mood-board-db-password',
       generateSecretString: {
@@ -43,34 +52,20 @@ export class MoodStack extends cdk.Stack {
         passwordLength: 30,
       },
     })
+  }
 
-    const dbSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
-      vpc,
-      description: 'Allow communication from ECS tasks to PostgreSQL',
-      securityGroupName: 'mood-board-rds-sg',
-    })
-
+  private createRdsInstance(vpc: ec2.Vpc, dbPassword: secretsmanager.Secret): rds.DatabaseInstance {
     const rdsVersion = rds.DatabaseInstanceEngine.postgres({
       version: rds.PostgresEngineVersion.VER_17_2,
     })
-    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
-      engine: rdsVersion,
-      description: 'Custom parameter group for the MoodBoard RDS instance',
-      name: 'mood-board-postgres-parameter-group',
-      parameters: {
-        log_statement: 'all',
-        log_min_duration_statement: '0',
-      },
-    })
-    parameterGroup.addParameter('rds.force_ssl', '0')
+    
+    const parameterGroup = this.createDbParameterGroup(rdsVersion)
+    const dbSecurityGroup = this.createDbSecurityGroup(vpc)
 
-    const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
+    return new rds.DatabaseInstance(this, 'MoodBoardRDS', {
       engine: rdsVersion,
       instanceIdentifier: 'mood-board-rds',
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.BURSTABLE3,
-        ec2.InstanceSize.SMALL
-      ),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
       databaseName: 'moodboard',
@@ -82,20 +77,45 @@ export class MoodStack extends cdk.Stack {
       }),
       parameterGroup
     })
-  
-    const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
+  }
+
+  private createDbParameterGroup(rdsVersion: rds.IEngine): rds.ParameterGroup {
+    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+      engine: rdsVersion,
+      description: 'Custom parameter group for the MoodBoard RDS instance',
+      name: 'mood-board-postgres-parameter-group',
+      parameters: {
+        log_statement: 'all',
+        log_min_duration_statement: '0',
+      },
+    })
+    parameterGroup.addParameter('rds.force_ssl', '0')
+
+    return parameterGroup
+  }
+
+  private createDbSecurityGroup(vpc: ec2.Vpc): ec2.SecurityGroup {
+    return new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
       vpc,
-      allowAllOutbound: true,
+      description: 'Allow communication from ECS tasks to PostgreSQL',
+      securityGroupName: 'mood-board-rds-sg',
+    })
+  }
+
+  private createEcsSecurityGroup(vpc: ec2.Vpc): ec2.SecurityGroup {
+    return new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
+      vpc,
+      allowAllOutbound: false,
       description: 'Allow communication from ECS tasks',
       securityGroupName: 'mood-board-ecs-sg',
     })
-    
-    dbSecurityGroup.addIngressRule(
-      ecsSecurityGroup,
-      ec2.Port.tcp(5432),
-      'Allow ECS tasks to connect to PostgreSQL'
-    )
-    
+  }
+
+  private allowEcsToDbAccess(ecsSecurityGroup: ec2.SecurityGroup, dbInstance: rds.DatabaseInstance) {
+    dbInstance.connections.allowFrom(ecsSecurityGroup, ec2.Port.tcp(5432), 'Allow ECS tasks to connect to PostgreSQL')
+  }
+
+  private createEcsService(cluster: ecs.Cluster, vpc: ec2.Vpc, dbPassword: secretsmanager.Secret, dbInstance: rds.DatabaseInstance, ecsSecurityGroup: ec2.SecurityGroup) {
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
@@ -114,7 +134,7 @@ export class MoodStack extends cdk.Stack {
           DB_PORT: dbInstance.dbInstanceEndpointPort,
           POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'moodboard',
-          NODE_ENV: 'production'
+          NODE_ENV: 'production',
         },
         secrets: {
           POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
