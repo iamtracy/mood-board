@@ -108,6 +108,7 @@ export class MoodStack extends cdk.Stack {
       desiredCount: 1,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
+      redirectHTTP: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
         containerPort: 3000,
