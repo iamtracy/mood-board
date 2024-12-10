@@ -96,7 +96,7 @@ export class MoodStack extends cdk.Stack {
       'Allow ECS tasks to connect to PostgreSQL'
     )
     
-    new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
+    const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
       cpu: 512,
@@ -120,6 +120,10 @@ export class MoodStack extends cdk.Stack {
           POSTGRES_PASSWORD: ecs.Secret.fromSecretsManager(dbPassword, 'password'),
         },
       },
+    })
+
+    moodBoardService.targetGroup.configureHealthCheck({
+      path: '/api/health',
     })
   }
 }
