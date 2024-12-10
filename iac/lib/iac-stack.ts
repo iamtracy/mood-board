@@ -64,14 +64,14 @@ export class MoodStack extends cdk.Stack {
     })
     parameterGroup.addParameter('rds.force_ssl', '0')
 
-    const dbInstanceType = this.node.tryGetContext('dbInstanceType') || 't3.micro'
-    const allocatedStorage = this.node.tryGetContext('allocatedStorage') || 20
+    const dbInstanceType: ec2.InstanceSize = this.node.tryGetContext('dbInstanceType') ?? ec2.InstanceSize.MICRO
+    const allocatedStorage: number = this.node.tryGetContext('allocatedStorage') ?? 20
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
       engine: rdsVersion,
       instanceIdentifier: 'mood-board-rds',
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T3,
-        dbInstanceType || ec2.InstanceSize.MICRO,
+        dbInstanceType,
       ),
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
@@ -97,9 +97,9 @@ export class MoodStack extends cdk.Stack {
       'Allow ECS tasks to connect to PostgreSQL'
     )
     
-    const containerPort = this.node.tryGetContext('containerPort') || 3000
-    const cpu = this.node.tryGetContext('cpu') || 512
-    const memory = this.node.tryGetContext('memory') || 2048
+    const containerPort: number = this.node.tryGetContext('containerPort') ?? 3000
+    const cpu: number = this.node.tryGetContext('cpu') ?? 512
+    const memory: number = this.node.tryGetContext('memory') ?? 2048
     const moodBoardService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'MoodBoardService', {
       serviceName: 'mood-board-service',
       cluster,
