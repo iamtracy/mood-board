@@ -5,7 +5,11 @@ import * as ecs from 'aws-cdk-lib/aws-ecs'
 import * as ecs_patterns from 'aws-cdk-lib/aws-ecs-patterns'
 import * as rds from 'aws-cdk-lib/aws-rds'
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
+import * as route53 from 'aws-cdk-lib/aws-route53'
+import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
 import * as path from 'path'
+
+const DOMAIN = 'is-mood.com'
 
 export class MoodStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -124,32 +128,16 @@ export class MoodStack extends cdk.Stack {
     moodBoardService.targetGroup.configureHealthCheck({
       path: '/api/health',
     })
+  
+    new route53.ARecord(this, 'AliasRecord', {
+      recordName: 'staging',
+      ttl: cdk.Duration.minutes(5),
+      target: route53.RecordTarget.fromAlias(
+        new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)
+      ),
+      zone: route53.HostedZone.fromLookup(this, 'HostedZone', {
+        domainName: DOMAIN,
+      }),
+    })
   }
 }
-
-// TODO: Add the following code to the MoodStack class once you have the domain set up
-// import * as acm from 'aws-cdk-lib/aws-certificatemanager'
-// import * as route53 from 'aws-cdk-lib/aws-route53'
-// import * as route53_targets from 'aws-cdk-lib/aws-route53-targets'
-
-// const domainName = process.env.DOMAIN!
-// const subDomain = process.env.SUBDOMAIN!
-
-// const certificate = new acm.Certificate(this, 'MoodBoardCertificate', {
-//   domainName,
-//   validation: acm.CertificateValidation.fromDns(),
-// })
-
-// const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-//   domainName,
-// })
-// albService.loadBalancer.addListener('Listener', {
-//   port: 443,
-//   certificates: [certificate],
-// })
-
-// new route53.ARecord(this, 'AliasRecord', {
-//   recordName: subDomain,
-//   target: route53.RecordTarget.fromAlias(new route53_targets.LoadBalancerTarget(albService.loadBalancer)),
-//   zone,
-// })
