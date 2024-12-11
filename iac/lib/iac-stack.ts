@@ -18,6 +18,7 @@ export class MoodStack extends cdk.Stack {
     
     const vpc = new ec2.Vpc(this, 'Vpc', {
       vpcName: 'mood-board-vpc',
+      availabilityZones: ['us-east-1a', 'us-east-1b'],
       maxAzs: 2,
       natGateways: 1,
       subnetConfiguration: [
