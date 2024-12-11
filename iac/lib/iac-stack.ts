@@ -65,7 +65,6 @@ export class MoodStack extends cdk.Stack {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
-      vpc,
       storageEncrypted: true,
       parameterGroup: new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
         engine,
@@ -88,7 +87,7 @@ export class MoodStack extends cdk.Stack {
         autoMinorVersionUpgrade: true,
         securityGroups: [dbSecurityGroup],
         vpcSubnets: vpc.selectSubnets({
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS, // use the public subnet created above for the db
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
         }),
       },
     })
