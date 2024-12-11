@@ -65,7 +65,6 @@ export class MoodStack extends cdk.Stack {
       storageEncrypted: true,
       engine,
       writer: rds.ClusterInstance.provisioned('writer', { 
-        instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
         instanceIdentifier: 'mood-board-writer',
       }),
       readers: [
