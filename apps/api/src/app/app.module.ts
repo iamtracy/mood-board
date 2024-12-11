@@ -28,9 +28,9 @@ import { HealthModule } from './health/health.module'
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        ...configService.get('database'),
-      }),
+      useFactory: (configService: ConfigService) => (
+        configService.get('database')
+      ),
       inject: [ConfigService],
     }),
     MoodModule,

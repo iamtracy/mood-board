@@ -1,39 +1,14 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-import api from './api'
+import { fetchData, createMood, updateMood, deleteMood, Mood } from './http'
 import './app.css'
-
-interface Mood {
-  id: string
-  mood: string
-}
-
-const fetchData = async () => {
-  const response = await api.get('mood')
-  return response.data
-}
-
-const createMood = async (mood: string) => {
-  const response = await api.post('mood', { mood })
-  return response.data
-}
-
-const updateMood = async (input: Mood) => {
-  const response = await api.put('mood', input)
-  return response.data
-}
-
-const deleteMood = async (id: string) => {
-  const response = await api.delete(`mood/${id}`)
-  return response.data
-}
 
 export function App() {
   const [moodInput, setMoodInput] = useState('')
   const [editingMoodId, setEditingMoodId] = useState<string | null>(null)
 
-  const { data, error, isPending, refetch } = useQuery({
+  const { data, error, refetch } = useQuery({
     queryKey: ['mood'],
     queryFn: fetchData,
   })
