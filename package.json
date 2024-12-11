@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "nx run-many --target=build",
-    "dev": "npx nx run-many --target=serve",
+    "dev": "docker-compose up -d && npm run migration:run && npx nx run-many --target=serve",
     "init:db": "./scripts/setup_db.sh start",
     "lint": "nx run-many --target=lint",
     "nx": "npx nx",
