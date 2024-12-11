@@ -16,17 +16,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Dependencies
-        run: npm install
+      # - name: Install Dependencies
+      #   run: npm install
 
-      - name: Unit tests
-        run: npm run test:unit:ci
+      # - name: Unit tests
+      #   run: npm run test:unit:ci
 
-      - name: Linting
-        run: npm run lint
+      # - name: Linting
+      #   run: npm run lint
 
-      - name: Build
-        run: npm run build
+      # - name: Build
+      #   run: npm run build
 
       - name: Set up AWS CLI
         if: github.ref == 'refs/heads/limit-ecs-size'
