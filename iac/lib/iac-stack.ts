@@ -55,42 +55,33 @@ export class MoodStack extends cdk.Stack {
       securityGroupName: 'mood-board-rds-sg',
     })
 
-    const rdsVersion = rds.DatabaseInstanceEngine.postgres({
-      version: rds.PostgresEngineVersion.VER_17_2,
+    const engine = rds.DatabaseClusterEngine.auroraPostgres({
+      version: rds.AuroraPostgresEngineVersion.VER_16_4,
     })
-    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
-      engine: rdsVersion,
-      description: 'Custom parameter group for the MoodBoard RDS instance',
-      name: 'mood-board-postgres-parameter-group',
-      parameters: {
-        log_statement: 'all',
-        log_min_duration_statement: '0',
-      },
-    })
-    parameterGroup.addParameter('rds.force_ssl', '0')
 
-    const dbCluster = new rds.DatabaseCluster(this, 'Database', {
-      engine: rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_17_2 }),
+    const dbCluster = new rds.DatabaseCluster(this, 'MoodBoardAuroraCluster', {
+      engine: engine,
+      serverlessV2MaxCapacity: 4,
+      serverlessV2MinCapacity: 0.5,
+      defaultDatabaseName: 'moodboard',
+      instanceIdentifierBase: 'mood-board-instance',
       credentials: rds.Credentials.fromSecret(dbPassword),
-      writer: rds.ClusterInstance.provisioned('writer', {
-        publiclyAccessible: false,
-      }),
-      readers: [
-        rds.ClusterInstance.provisioned('reader', {
-          publiclyAccessible: false,
-        }),
-      ],
-      parameters: {
-        log_statement: 'all',
-        log_min_duration_statement: '0',
-        'rds.force_ssl': '0',
-      },
-      storageType: rds.DBClusterStorageType.AURORA_IOPT1,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
       vpc,
       storageEncrypted: true,
+      storageType: rds.DBClusterStorageType.AURORA_IOPT1,
+      parameterGroup: new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+        engine: engine,
+        description: 'Custom parameter group for the MoodBoard Aurora instance',
+        name: 'mood-board-serverless-parameter-group',
+        parameters: {
+          log_statement: 'all',
+          log_min_duration_statement: '0',
+          'rds.force_ssl': '0',
+        },
+      })
     })
 
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
