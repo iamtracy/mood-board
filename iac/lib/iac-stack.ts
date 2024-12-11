@@ -73,7 +73,7 @@ export class MoodStack extends cdk.Stack {
       parameterGroup: new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
         engine: rdsVersion,
         description: 'Custom parameter group for the MoodBoard RDS instance',
-        name: 'mood-board-postgres-parameter-group',
+        name: 'mood-board-db-parameter-group',
         parameters: {
           log_statement: 'all',
           log_min_duration_statement: '0',
