@@ -116,12 +116,12 @@ export class MoodStack extends cdk.Stack {
         process.env.CERTIFICATE_ARN ?? ''
       ),
       cluster,
-      cpu: 512,
+      cpu: 256,
       securityGroups: [ecsSecurityGroup],
       loadBalancerName: 'mood-board-alb',
       desiredCount: 1,
       redirectHTTP: true,
-      memoryLimitMiB: 2048,
+      memoryLimitMiB: 512,
       publicLoadBalancer: true,
       taskImageOptions: {
         image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../')),
