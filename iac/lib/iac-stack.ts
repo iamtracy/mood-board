@@ -58,22 +58,17 @@ export class MoodStack extends cdk.Stack {
     const engine = rds.DatabaseClusterEngine.auroraPostgres({
       version: rds.AuroraPostgresEngineVersion.VER_16_4,
     })
-
     const dbCluster = new rds.DatabaseCluster(this, 'MoodBoardAuroraCluster', {
-      engine: engine,
       serverlessV2MaxCapacity: 1,
       serverlessV2MinCapacity: 0,
-      defaultDatabaseName: 'moodboard',
       instanceIdentifierBase: 'mood-board-instance',
-      credentials: rds.Credentials.fromSecret(dbPassword),
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       },
       vpc,
       storageEncrypted: true,
-      storageType: rds.DBClusterStorageType.AURORA_IOPT1,
       parameterGroup: new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
-        engine: engine,
+        engine,
         description: 'Custom parameter group for the MoodBoard Aurora instance',
         name: 'mood-board-serverless-parameter-group',
         parameters: {
@@ -81,7 +76,21 @@ export class MoodStack extends cdk.Stack {
           log_min_duration_statement: '0',
           'rds.force_ssl': '0',
         },
-      })
+      }),
+      engine,
+      credentials: rds.Credentials.fromSecret(dbPassword),
+      defaultDatabaseName: 'moodboard',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      storageType: rds.DBClusterStorageType.AURORA_IOPT1,
+      instanceProps: {
+        vpc,
+        instanceType: new ec2.InstanceType('serverless'),
+        autoMinorVersionUpgrade: true,
+        securityGroups: [dbSecurityGroup],
+        vpcSubnets: vpc.selectSubnets({
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS, // use the public subnet created above for the db
+        }),
+      },
     })
 
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
