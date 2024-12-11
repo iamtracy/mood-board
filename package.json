@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "npm run nx run-many --target=build",
-    "dev": "docker-compose up -d && npm run migration:run && npm run nx run-many --target=serve",
+    "build": "npx nx run-many --target=build",
+    "dev": "docker-compose up -d && npm run migration:run && npx nx run-many --target=serve",
     "init:db": "./scripts/setup_db.sh start",
-    "lint": "npm run nx run-many --target=lint",
+    "lint": "nx run-many --target=lint",
     "migration:create": "npm run migration -- migration:create ./db/migrations/migration",
     "migration:generate": "npm run migration -- -d ./db/typeorm.config.ts migration:generate ./db/migrations/migration",
     "migration:revert": "npm run migration -- -d ./db/typeorm.config.ts migration:revert",
@@ -14,8 +14,8 @@
     "migration:show": "npm run migration -- migration:show -d ./db/typeorm.config.ts",
     "migration": "ts-node -P tsconfig.migration.json --require tsconfig-paths/register ./node_modules/typeorm/cli",
     "nx": "npx nx",
-    "test:unit:ci": "npm run nx run-many --target=test --coverage --ci",
-    "test:unit": "npm run nx affected:test --all --parallel --watch"
+    "test:unit:ci": "nx run-many --target=test --coverage --ci",
+    "test:unit": "nx affected:test --all --parallel --watch"
   },
   "private": true,
   "dependencies": {
