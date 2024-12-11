@@ -61,8 +61,8 @@ export class MoodStack extends cdk.Stack {
 
     const dbCluster = new rds.DatabaseCluster(this, 'MoodBoardAuroraCluster', {
       engine: engine,
-      serverlessV2MaxCapacity: 4,
-      serverlessV2MinCapacity: 0.5,
+      serverlessV2MaxCapacity: 1,
+      serverlessV2MinCapacity: 0,
       defaultDatabaseName: 'moodboard',
       instanceIdentifierBase: 'mood-board-instance',
       credentials: rds.Credentials.fromSecret(dbPassword),
