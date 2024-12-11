@@ -69,26 +69,30 @@ export class MoodStack extends cdk.Stack {
     })
     parameterGroup.addParameter('rds.force_ssl', '0')
 
-    const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
-      engine: rdsVersion,
-      instanceIdentifier: 'mood-board-rds',
-      storageEncrypted: true,
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
-        ec2.InstanceSize.MICRO,
-      ),
-      vpc,
+    const dbCluster = new rds.DatabaseCluster(this, 'Database', {
+      engine: rds.DatabaseClusterEngine.auroraPostgres({ version: rds.AuroraPostgresEngineVersion.VER_17_2 }),
       credentials: rds.Credentials.fromSecret(dbPassword),
-      databaseName: 'moodboard',
-      allocatedStorage: 20,
-      securityGroups: [dbSecurityGroup],
-      subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {
-        vpc,
-        description: 'Subnets for MoodBoard RDS instance',
+      writer: rds.ClusterInstance.provisioned('writer', {
+        publiclyAccessible: false,
       }),
-      parameterGroup
+      readers: [
+        rds.ClusterInstance.provisioned('reader', {
+          publiclyAccessible: false,
+        }),
+      ],
+      parameters: {
+        log_statement: 'all',
+        log_min_duration_statement: '0',
+        'rds.force_ssl': '0',
+      },
+      storageType: rds.DBClusterStorageType.AURORA_IOPT1,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+      },
+      vpc,
+      storageEncrypted: true,
     })
-  
+
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
       vpc,
       description: 'Allow communication from ECS tasks',
@@ -121,8 +125,8 @@ export class MoodStack extends cdk.Stack {
         containerPort: 3000,
         containerName: 'mood-board-container',
         environment: {
-          DB_HOST: dbInstance.dbInstanceEndpointAddress,
-          DB_PORT: dbInstance.dbInstanceEndpointPort,
+          DB_HOST: dbCluster.clusterEndpoint.hostname,
+          DB_PORT: dbCluster.clusterEndpoint.port.toString(),
           POSTGRES_USERNAME: 'postgres',
           POSTGRES_DB: 'moodboard',
           NODE_ENV: 'production'
