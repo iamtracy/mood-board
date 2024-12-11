@@ -44,6 +44,20 @@ export class MoodStack extends cdk.Stack {
       },
     })
 
+    const rdsVersion = rds.DatabaseInstanceEngine.postgres({
+      version: rds.PostgresEngineVersion.VER_17_2,
+    })
+    new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+      engine: rdsVersion,
+      description: 'Custom parameter group for the MoodBoard RDS instance',
+      name: 'mood-board-postgres-parameter-group',
+      parameters: {
+        log_statement: 'all',
+        log_min_duration_statement: '0',
+        force_ssl: '1',
+      },
+    })
+
     const dbSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
       vpc,
       description: 'Allow communication from ECS tasks to PostgreSQL',
@@ -51,9 +65,7 @@ export class MoodStack extends cdk.Stack {
     })
 
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
-      engine: rds.DatabaseInstanceEngine.postgres({
-        version: rds.PostgresEngineVersion.VER_17_2,
-      }),
+      engine: rdsVersion,
       instanceIdentifier: 'mood-board-rds',
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T3,
