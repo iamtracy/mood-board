@@ -72,6 +72,7 @@ export class MoodStack extends cdk.Stack {
         rds.ClusterInstance.serverlessV2('reader', {
           scaleWithWriter: true,
           instanceIdentifier: 'mood-board-reader',
+          parameterGroup
         }),
       ],
       credentials: rds.Credentials.fromSecret(dbPassword),
@@ -84,7 +85,7 @@ export class MoodStack extends cdk.Stack {
       vpcSubnets: vpc.selectSubnets({
         subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
       }),
-      parameterGroup: new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+      parameterGroup: new rds.ParameterGroup(this, 'MoodBoardAuroraParameterGroup', {
         engine,
         description: 'Custom parameter group for the MoodBoard Aurora instance',
         name: 'mood-board-serverless-parameter-group',
