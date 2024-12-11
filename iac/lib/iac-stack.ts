@@ -44,27 +44,17 @@ export class MoodStack extends cdk.Stack {
       },
     })
 
-    const rdsVersion = rds.DatabaseInstanceEngine.postgres({
-      version: rds.PostgresEngineVersion.VER_17_2,
-    })
-    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
-      engine: rdsVersion,
-      description: 'Custom parameter group for the MoodBoard RDS instance',
-      name: 'mood-board-postgres-parameter-group',
-      parameters: {
-        log_statement: 'all',
-        log_min_duration_statement: '0',
-      },
-    })
-    parameterGroup.addParameter('rds.force_ssl', '1')
-
     const dbSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
       vpc,
       description: 'Allow communication from ECS tasks to PostgreSQL',
       securityGroupName: 'mood-board-rds-sg',
     })
-
+    
+    const rdsVersion = rds.DatabaseInstanceEngine.postgres({
+      version: rds.PostgresEngineVersion.VER_17_2,
+    })
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
+      allocatedStorage: 20,
       engine: rdsVersion,
       instanceIdentifier: 'mood-board-rds',
       instanceType: ec2.InstanceType.of(
@@ -74,11 +64,21 @@ export class MoodStack extends cdk.Stack {
       vpc,
       credentials: rds.Credentials.fromSecret(dbPassword),
       databaseName: 'moodboard',
-      allocatedStorage: 20,
       securityGroups: [dbSecurityGroup],
+      storageEncrypted: true,
       subnetGroup: new rds.SubnetGroup(this, 'MoodBoardRdsSubnetGroup', {
         vpc,
         description: 'Subnets for MoodBoard RDS instance',
+      }),
+      parameterGroup: new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+        engine: rdsVersion,
+        description: 'Custom parameter group for the MoodBoard RDS instance',
+        name: 'mood-board-postgres-parameter-group',
+        parameters: {
+          log_statement: 'all',
+          log_min_duration_statement: '0',
+          'rds.force_ssl': '1',
+        },
       }),
     })
   
