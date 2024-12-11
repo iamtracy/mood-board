@@ -1,5 +1,8 @@
 import { DataSource } from 'typeorm'
 import { ConfigService } from '@nestjs/config'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const configService = new ConfigService()
 

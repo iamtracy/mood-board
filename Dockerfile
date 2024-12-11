@@ -19,10 +19,13 @@ COPY --from=build /app/apps/api/src/app/entities ./entities
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/scripts/migrate-and-start.sh ./scripts/migrate-and-start.sh
 
-ENV NODE_ENV=production
-
+ARG NODE_ENV=production
 ARG PORT=3000
+ARG DB_PORT=5432
+
+ENV NODE_ENV=${NODE_ENV}
 ENV PORT=${PORT}
+ENV DB_PORT=${DB_PORT}
 
 EXPOSE ${PORT}
 
