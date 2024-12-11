@@ -64,7 +64,7 @@ export class MoodStack extends cdk.Stack {
       instanceIdentifierBase: 'mood-board-instance',
       storageEncrypted: true,
       engine,
-      writer: rds.ClusterInstance.provisioned('writer', { 
+      writer: rds.ClusterInstance.serverlessV2('writer', {
         instanceIdentifier: 'mood-board-writer',
       }),
       readers: [
