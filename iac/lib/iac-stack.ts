@@ -56,7 +56,7 @@ export class MoodStack extends cdk.Stack {
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
       allocatedStorage: 20,
       engine: rdsVersion,
-      instanceIdentifier: 'mood-board-rds',
+      instanceIdentifier: 'mood-board-db',
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T3,
         ec2.InstanceSize.MICRO,
