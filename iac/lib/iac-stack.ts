@@ -31,11 +31,6 @@ export class MoodStack extends cdk.Stack {
         },
       ],
     })
-
-    const cluster = new ecs.Cluster(this, 'MoodBoardCluster', {
-      clusterName: 'mood-board-cluster',
-      vpc,
-    })
     
     const dbPassword = new secretsmanager.Secret(this, 'MoodBoardDbPassword', {
       description: 'Password for the MoodBoard RDS instance',
@@ -55,22 +50,10 @@ export class MoodStack extends cdk.Stack {
       securityGroupName: 'mood-board-rds-sg',
     })
 
-    const rdsVersion = rds.DatabaseInstanceEngine.postgres({
-      version: rds.PostgresEngineVersion.VER_17_2,
-    })
-    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
-      engine: rdsVersion,
-      description: 'Custom parameter group for the MoodBoard RDS instance',
-      name: 'mood-board-postgres-parameter-group',
-      parameters: {
-        log_statement: 'all',
-        log_min_duration_statement: '0',
-      },
-    })
-    parameterGroup.addParameter('rds.force_ssl', '0')
-
     const dbInstance = new rds.DatabaseInstance(this, 'MoodBoardRDS', {
-      engine: rdsVersion,
+      engine: rds.DatabaseInstanceEngine.postgres({
+        version: rds.PostgresEngineVersion.VER_17_2,
+      }),
       instanceIdentifier: 'mood-board-rds',
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T3,
@@ -85,7 +68,6 @@ export class MoodStack extends cdk.Stack {
         vpc,
         description: 'Subnets for MoodBoard RDS instance',
       }),
-      parameterGroup
     })
   
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
@@ -107,7 +89,10 @@ export class MoodStack extends cdk.Stack {
         'MoodCertificate',
         process.env.CERTIFICATE_ARN ?? ''
       ),
-      cluster,
+      cluster: new ecs.Cluster(this, 'MoodBoardCluster', {
+        clusterName: 'mood-board-cluster',
+        vpc,
+      }),
       cpu: 512,
       securityGroups: [ecsSecurityGroup],
       loadBalancerName: 'mood-board-alb',
@@ -138,7 +123,6 @@ export class MoodStack extends cdk.Stack {
   
     new route53.ARecord(this, 'AliasRecord', {
       recordName: 'staging',
-      ttl: cdk.Duration.minutes(5),
       comment: 'DNS record for the MoodBoard service',
       target: route53.RecordTarget.fromAlias(
         new route53_targets.LoadBalancerTarget(moodBoardService.loadBalancer)

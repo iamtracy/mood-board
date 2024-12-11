@@ -20,4 +20,5 @@ export default registerAs('database', () => ({
     synchronize: isDevelopment,
     type: 'postgres',
     username: POSTGRES_USERNAME,
+    ssl: isDevelopment ? false : { rejectUnauthorized: false },
 }))
