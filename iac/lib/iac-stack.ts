@@ -47,16 +47,16 @@ export class MoodStack extends cdk.Stack {
     const rdsVersion = rds.DatabaseInstanceEngine.postgres({
       version: rds.PostgresEngineVersion.VER_17_2,
     })
-    new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
+    const parameterGroup = new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
       engine: rdsVersion,
       description: 'Custom parameter group for the MoodBoard RDS instance',
       name: 'mood-board-postgres-parameter-group',
       parameters: {
         log_statement: 'all',
         log_min_duration_statement: '0',
-        force_ssl: '1',
       },
     })
+    parameterGroup.addParameter('rds.force_ssl', '1')
 
     const dbSecurityGroup = new ec2.SecurityGroup(this, 'RdsSecurityGroup', {
       vpc,
