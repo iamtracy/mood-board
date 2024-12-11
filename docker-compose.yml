@@ -1,6 +1,6 @@
 services:
   postgres-db:
-    image: postgres:17.2
+    image: postgres:16.4
     container_name: ${CONTAINER_NAME:-postgres-db}
     env_file:
       - .env
