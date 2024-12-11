@@ -112,6 +112,7 @@ export class MoodStack extends cdk.Stack {
       securityGroups: [ecsSecurityGroup],
       loadBalancerName: 'mood-board-alb',
       desiredCount: 1,
+      redirectHTTP: true,
       memoryLimitMiB: 2048,
       publicLoadBalancer: true,
       taskImageOptions: {
