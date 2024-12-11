@@ -62,10 +62,28 @@ export class MoodStack extends cdk.Stack {
       serverlessV2MaxCapacity: 1,
       serverlessV2MinCapacity: 0,
       instanceIdentifierBase: 'mood-board-instance',
-      vpcSubnets: {
-        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-      },
       storageEncrypted: true,
+      engine,
+      writer: rds.ClusterInstance.provisioned('writer', { 
+        instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
+        instanceIdentifier: 'mood-board-writer',
+      }),
+      readers: [
+        rds.ClusterInstance.serverlessV2('reader', {
+          scaleWithWriter: true,
+          instanceIdentifier: 'mood-board-reader',
+        }),
+      ],
+      credentials: rds.Credentials.fromSecret(dbPassword),
+      defaultDatabaseName: 'moodboard',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      storageType: rds.DBClusterStorageType.AURORA_IOPT1,
+      vpc,
+      autoMinorVersionUpgrade: true,
+      securityGroups: [dbSecurityGroup],
+      vpcSubnets: vpc.selectSubnets({
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+      }),
       parameterGroup: new rds.ParameterGroup(this, 'MoodBoardPostgresParameterGroup', {
         engine,
         description: 'Custom parameter group for the MoodBoard Aurora instance',
@@ -76,20 +94,6 @@ export class MoodStack extends cdk.Stack {
           'rds.force_ssl': '0',
         },
       }),
-      engine,
-      credentials: rds.Credentials.fromSecret(dbPassword),
-      defaultDatabaseName: 'moodboard',
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      storageType: rds.DBClusterStorageType.AURORA_IOPT1,
-      instanceProps: {
-        vpc,
-        instanceType: new ec2.InstanceType('serverless'),
-        autoMinorVersionUpgrade: true,
-        securityGroups: [dbSecurityGroup],
-        vpcSubnets: vpc.selectSubnets({
-          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-        }),
-      },
     })
 
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'MoodBoardServiceSG', {
