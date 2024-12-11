@@ -72,7 +72,6 @@ export class MoodStack extends cdk.Stack {
         rds.ClusterInstance.serverlessV2('reader', {
           scaleWithWriter: true,
           instanceIdentifier: 'mood-board-reader',
-          parameterGroup
         }),
       ],
       credentials: rds.Credentials.fromSecret(dbPassword),
