@@ -75,6 +75,7 @@ export class MoodStack extends cdk.Stack {
       ],
       credentials: rds.Credentials.fromSecret(dbPassword),
       defaultDatabaseName: 'moodboard',
+      enableDataApi: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       storageType: rds.DBClusterStorageType.AURORA_IOPT1,
       vpc,
