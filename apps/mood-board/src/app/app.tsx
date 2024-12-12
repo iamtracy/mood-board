@@ -52,7 +52,7 @@ export function App() {
 
   return (
     <div className="app">
-      <h1 className="header">Mood Tracker</h1>
+      <h1 className="header">My Mood Tracker</h1>
       <div className="mood-container">
         <h2>Data from API:</h2>
         {(data ?? []).map((mood: Mood) => (
