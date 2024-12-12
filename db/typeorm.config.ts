@@ -8,10 +8,10 @@ const configService = new ConfigService()
 
 export default new DataSource({
   database: configService.get('POSTGRES_DB'),
-  entities: ['/app/entities/**/*.entity.{ts,js}'],
+  entities: ['/app/entities/**/*.entity.ts'],
   host: configService.get('DB_HOST'),
   logging: false,
-  migrations: ['/app/db/migrations/*.{ts,js}'],
+  migrations: ['/app/db/migrations/*.ts'],
   password: configService.get('POSTGRES_PASSWORD'),
   port: +(configService.get('DB_PORT') ?? 5432),
   synchronize: false,
